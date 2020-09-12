@@ -1,16 +1,41 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
   <component name="ChangeListManager">
     <list default="true" id="af1f19f4-6211-4b9a-856d-0476bbea2894" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/src/Controller/SecurityController.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Api/ApiProblem.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Controller/ApiController.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Entity/ApiResourceEntityInterface.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/EventListener/ApiExceptionSubscriber.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Exception/ApiProblemException.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Pagination/PaginatedCollection.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Serializer/Normalizer/UserNormalizer.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.env" beforeDir="false" afterPath="$PROJECT_DIR$/.env" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/php.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/php.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/security.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/security.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/composer.json" beforeDir="false" afterPath="$PROJECT_DIR$/composer.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/composer.lock" beforeDir="false" afterPath="$PROJECT_DIR$/composer.lock" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/config/bundles.php" beforeDir="false" afterPath="$PROJECT_DIR$/config/bundles.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/packages/framework.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/config/packages/framework.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/packages/security.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/config/packages/security.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/services.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/config/services.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Controller/HomePageController.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Controller/HomePageController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Controller/ProductController.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Controller/ProductController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Controller/SecurityController.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Controller/SecurityController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Controller/UserController.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Controller/UserController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Entity/Product.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Entity/Product.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Entity/User.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Entity/User.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Form/ProductType.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Form/ProductType.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Form/UserType.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Form/UserType.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Repository/UserRepository.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Repository/UserRepository.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Serializer/UserNormalizer.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Serializer/CircularReferenceHandler.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Test/CustomApiTestCase.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Test/CustomApiTestCase.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/symfony.lock" beforeDir="false" afterPath="$PROJECT_DIR$/symfony.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/Functional/ProductResourceTest.php" beforeDir="false" afterPath="$PROJECT_DIR$/tests/Functional/ProductResourceTest.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/Functional/UserResourceTest.php" beforeDir="false" afterPath="$PROJECT_DIR$/tests/Functional/UserResourceTest.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -68,29 +93,11 @@
       <path value="$PROJECT_DIR$/vendor/doctrine/inflector" />
       <path value="$PROJECT_DIR$/vendor/nikic/php-parser" />
       <path value="$PROJECT_DIR$/vendor/symfony/maker-bundle" />
-      <path value="$PROJECT_DIR$/vendor/ocramius/proxy-manager" />
       <path value="$PROJECT_DIR$/vendor/twig/extra-bundle" />
       <path value="$PROJECT_DIR$/vendor/twig/twig" />
-      <path value="$PROJECT_DIR$/vendor/doctrine/dbal" />
-      <path value="$PROJECT_DIR$/vendor/doctrine/orm" />
-      <path value="$PROJECT_DIR$/vendor/doctrine/migrations" />
-      <path value="$PROJECT_DIR$/vendor/doctrine/common" />
       <path value="$PROJECT_DIR$/vendor/doctrine/instantiator" />
       <path value="$PROJECT_DIR$/vendor/doctrine/annotations" />
-      <path value="$PROJECT_DIR$/vendor/doctrine/collections" />
-      <path value="$PROJECT_DIR$/vendor/doctrine/reflection" />
       <path value="$PROJECT_DIR$/vendor/doctrine/lexer" />
-      <path value="$PROJECT_DIR$/vendor/doctrine/doctrine-bundle" />
-      <path value="$PROJECT_DIR$/vendor/doctrine/persistence" />
-      <path value="$PROJECT_DIR$/vendor/doctrine/event-manager" />
-      <path value="$PROJECT_DIR$/vendor/doctrine/doctrine-migrations-bundle" />
-      <path value="$PROJECT_DIR$/vendor/doctrine/sql-formatter" />
-      <path value="$PROJECT_DIR$/vendor/doctrine/cache" />
-      <path value="$PROJECT_DIR$/vendor/laminas/laminas-zendframework-bridge" />
-      <path value="$PROJECT_DIR$/vendor/laminas/laminas-eventmanager" />
-      <path value="$PROJECT_DIR$/vendor/laminas/laminas-code" />
-      <path value="$PROJECT_DIR$/vendor/webimpress/safe-writer" />
-      <path value="$PROJECT_DIR$/vendor/symfony/doctrine-bridge" />
       <path value="$PROJECT_DIR$/vendor/symfony/translation-contracts" />
       <path value="$PROJECT_DIR$/vendor/symfony/stopwatch" />
       <path value="$PROJECT_DIR$/vendor/symfony/twig-bridge" />
@@ -109,6 +116,53 @@
       <path value="$PROJECT_DIR$/vendor/symfony/browser-kit" />
       <path value="$PROJECT_DIR$/vendor/symfony/css-selector" />
       <path value="$PROJECT_DIR$/vendor/symfony/dom-crawler" />
+      <path value="$PROJECT_DIR$/vendor/phpdocumentor/reflection-docblock" />
+      <path value="$PROJECT_DIR$/vendor/phpdocumentor/type-resolver" />
+      <path value="$PROJECT_DIR$/vendor/phpdocumentor/reflection-common" />
+      <path value="$PROJECT_DIR$/vendor/nelmio/cors-bundle" />
+      <path value="$PROJECT_DIR$/vendor/webmozart/assert" />
+      <path value="$PROJECT_DIR$/vendor/fig/link-util" />
+      <path value="$PROJECT_DIR$/vendor/psr/link" />
+      <path value="$PROJECT_DIR$/vendor/symfony/web-link" />
+      <path value="$PROJECT_DIR$/vendor/symfony/asset" />
+      <path value="$PROJECT_DIR$/vendor/symfony/serializer" />
+      <path value="$PROJECT_DIR$/vendor/symfony/expression-language" />
+      <path value="$PROJECT_DIR$/vendor/willdurand/negotiation" />
+      <path value="$PROJECT_DIR$/vendor/api-platform/core" />
+      <path value="$PROJECT_DIR$/vendor/symfony/http-client" />
+      <path value="$PROJECT_DIR$/vendor/symfony/http-client-contracts" />
+      <path value="$PROJECT_DIR$/vendor/fzaninotto/faker" />
+      <path value="$PROJECT_DIR$/vendor/myclabs/deep-copy" />
+      <path value="$PROJECT_DIR$/vendor/webimpress/safe-writer" />
+      <path value="$PROJECT_DIR$/vendor/sebastian/exporter" />
+      <path value="$PROJECT_DIR$/vendor/sebastian/comparator" />
+      <path value="$PROJECT_DIR$/vendor/sebastian/diff" />
+      <path value="$PROJECT_DIR$/vendor/sebastian/recursion-context" />
+      <path value="$PROJECT_DIR$/vendor/ocramius/proxy-manager" />
+      <path value="$PROJECT_DIR$/vendor/doctrine/cache" />
+      <path value="$PROJECT_DIR$/vendor/doctrine/doctrine-migrations-bundle" />
+      <path value="$PROJECT_DIR$/vendor/doctrine/sql-formatter" />
+      <path value="$PROJECT_DIR$/vendor/doctrine/persistence" />
+      <path value="$PROJECT_DIR$/vendor/doctrine/event-manager" />
+      <path value="$PROJECT_DIR$/vendor/doctrine/reflection" />
+      <path value="$PROJECT_DIR$/vendor/doctrine/doctrine-bundle" />
+      <path value="$PROJECT_DIR$/vendor/doctrine/common" />
+      <path value="$PROJECT_DIR$/vendor/doctrine/collections" />
+      <path value="$PROJECT_DIR$/vendor/doctrine/data-fixtures" />
+      <path value="$PROJECT_DIR$/vendor/doctrine/migrations" />
+      <path value="$PROJECT_DIR$/vendor/doctrine/dbal" />
+      <path value="$PROJECT_DIR$/vendor/doctrine/orm" />
+      <path value="$PROJECT_DIR$/vendor/symfony/doctrine-bridge" />
+      <path value="$PROJECT_DIR$/vendor/laminas/laminas-zendframework-bridge" />
+      <path value="$PROJECT_DIR$/vendor/laminas/laminas-eventmanager" />
+      <path value="$PROJECT_DIR$/vendor/laminas/laminas-code" />
+      <path value="$PROJECT_DIR$/vendor/nelmio/alice" />
+      <path value="$PROJECT_DIR$/vendor/theofidry/alice-data-fixtures" />
+      <path value="$PROJECT_DIR$/vendor/hautelook/alice-bundle" />
+      <path value="$PROJECT_DIR$/vendor/symfony/monolog-bundle" />
+      <path value="$PROJECT_DIR$/vendor/symfony/monolog-bridge" />
+      <path value="$PROJECT_DIR$/vendor/monolog/monolog" />
+      <path value="$PROJECT_DIR$/vendor/pagerfanta/pagerfanta" />
     </include_path>
   </component>
   <component name="ProjectId" id="1hCdNmC2zG0fwTpMcQVZJ7X56PE" />
@@ -119,8 +173,14 @@
   <component name="PropertiesComponent">
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../../fitness" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../../code-symfony-rest3/finish" />
+    <property name="php.override.implement.member.chooser.php.doc" value="NONE" />
     <property name="vue.rearranger.settings.migration" value="true" />
+  </component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/src/Serializer/Normalizer" />
+    </key>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
@@ -140,6 +200,79 @@
       <workItem from="1599530985247" duration="1237000" />
       <workItem from="1599532792230" duration="739000" />
       <workItem from="1599535888561" duration="201000" />
+      <workItem from="1599561165445" duration="1795000" />
+      <workItem from="1599563032777" duration="1771000" />
+      <workItem from="1599564925650" duration="1795000" />
+      <workItem from="1599566738748" duration="1948000" />
+      <workItem from="1599568701163" duration="1797000" />
+      <workItem from="1599570511016" duration="1872000" />
+      <workItem from="1599598959985" duration="1482000" />
+      <workItem from="1599600764910" duration="1024000" />
+      <workItem from="1599603781120" duration="1431000" />
+      <workItem from="1599605588091" duration="1798000" />
+      <workItem from="1599607396785" duration="1796000" />
+      <workItem from="1599609203397" duration="1796000" />
+      <workItem from="1599611125556" duration="1796000" />
+      <workItem from="1599612934755" duration="1533000" />
+      <workItem from="1599614744571" duration="2229000" />
+      <workItem from="1599617240994" duration="1795000" />
+      <workItem from="1599619050869" duration="1804000" />
+      <workItem from="1599620868454" duration="2305000" />
+      <workItem from="1599623187063" duration="1797000" />
+      <workItem from="1599624999095" duration="1011000" />
+      <workItem from="1599656781775" duration="1747000" />
+      <workItem from="1599658543977" duration="1795000" />
+      <workItem from="1599660354217" duration="1795000" />
+      <workItem from="1599662160404" duration="1795000" />
+      <workItem from="1599664016104" duration="1781000" />
+      <workItem from="1599665953804" duration="1794000" />
+      <workItem from="1599667758746" duration="1804000" />
+      <workItem from="1599669574889" duration="1795000" />
+      <workItem from="1599671381947" duration="1797000" />
+      <workItem from="1599673196628" duration="1640000" />
+      <workItem from="1599675213929" duration="1542000" />
+      <workItem from="1599677020757" duration="1345000" />
+      <workItem from="1599678827539" duration="1507000" />
+      <workItem from="1599680638538" duration="1794000" />
+      <workItem from="1599682640038" duration="1794000" />
+      <workItem from="1599684444567" duration="2651000" />
+      <workItem from="1599687116457" duration="1795000" />
+      <workItem from="1599688924744" duration="1794000" />
+      <workItem from="1599690736339" duration="1791000" />
+      <workItem from="1599692764363" duration="1695000" />
+      <workItem from="1599694576240" duration="1791000" />
+      <workItem from="1599696437706" duration="1795000" />
+      <workItem from="1599698258226" duration="860000" />
+      <workItem from="1599700254651" duration="1578000" />
+      <workItem from="1599703051503" duration="1792000" />
+      <workItem from="1599705114151" duration="1796000" />
+      <workItem from="1599706922968" duration="1985000" />
+      <workItem from="1599711452016" duration="254000" />
+      <workItem from="1599790076786" duration="1576000" />
+      <workItem from="1599791666942" duration="1794000" />
+      <workItem from="1599793626464" duration="1796000" />
+      <workItem from="1599795434905" duration="1804000" />
+      <workItem from="1599797756321" duration="1100000" />
+      <workItem from="1599836891179" duration="4593000" />
+      <workItem from="1599842085439" duration="2571000" />
+      <workItem from="1599844683273" duration="1795000" />
+      <workItem from="1599846496958" duration="1795000" />
+      <workItem from="1599848490227" duration="1796000" />
+      <workItem from="1599850298373" duration="1578000" />
+      <workItem from="1599852108921" duration="1795000" />
+      <workItem from="1599853916392" duration="1796000" />
+      <workItem from="1599855723878" duration="1796000" />
+      <workItem from="1599858338664" duration="1915000" />
+      <workItem from="1599860649484" duration="1797000" />
+      <workItem from="1599862528768" duration="1796000" />
+      <workItem from="1599864335976" duration="1796000" />
+      <workItem from="1599866143830" duration="1796000" />
+      <workItem from="1599867951082" duration="1795000" />
+      <workItem from="1599869757436" duration="1797000" />
+      <workItem from="1599871564854" duration="1796000" />
+      <workItem from="1599873995043" duration="1796000" />
+      <workItem from="1599875810955" duration="2103000" />
+      <workItem from="1599877957318" duration="1325000" />
     </task>
     <servers />
   </component>
@@ -147,17 +280,29 @@
     <option name="version" value="3" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="729" y="311" width="524" height="491" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog" timestamp="1599519526978">
+    <state x="785" y="234" width="441" height="652" key="#com.intellij.ide.util.MemberChooser" timestamp="1599868898952">
       <screen x="72" y="27" width="1848" height="1053" />
     </state>
-    <state x="729" y="311" width="524" height="491" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog/72.27.1848.1053@72.27.1848.1053" timestamp="1599519526978" />
-    <state x="779" y="311" width="424" height="491" key="FileChooserDialogImpl" timestamp="1599519467872">
+    <state x="785" y="234" width="441" height="652" key="#com.intellij.ide.util.MemberChooser/72.27.1848.1053@72.27.1848.1053" timestamp="1599868898952" />
+    <state x="539" y="176" width="894" height="769" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog" timestamp="1599793227440">
       <screen x="72" y="27" width="1848" height="1053" />
     </state>
-    <state x="779" y="311" width="424" height="491" key="FileChooserDialogImpl/72.27.1848.1053@72.27.1848.1053" timestamp="1599519467872" />
-    <state x="678" y="273" width="625" height="568" key="NewPhpClassDialog" timestamp="1599519931281">
+    <state x="539" y="176" width="894" height="769" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog/72.27.1848.1053@72.27.1848.1053" timestamp="1599793227440" />
+    <state x="729" y="311" width="524" height="491" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog" timestamp="1599853299883">
       <screen x="72" y="27" width="1848" height="1053" />
     </state>
-    <state x="678" y="273" width="625" height="568" key="NewPhpClassDialog/72.27.1848.1053@72.27.1848.1053" timestamp="1599519931281" />
+    <state x="729" y="311" width="524" height="491" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog/72.27.1848.1053@72.27.1848.1053" timestamp="1599853299883" />
+    <state x="779" y="311" width="424" height="491" key="FileChooserDialogImpl" timestamp="1599878811459">
+      <screen x="72" y="27" width="1848" height="1053" />
+    </state>
+    <state x="779" y="311" width="424" height="491" key="FileChooserDialogImpl/72.27.1848.1053@72.27.1848.1053" timestamp="1599878811459" />
+    <state x="678" y="273" width="665" height="575" key="NewPhpClassDialog" timestamp="1599876558704">
+      <screen x="72" y="27" width="1848" height="1053" />
+    </state>
+    <state x="678" y="273" width="665" height="575" key="NewPhpClassDialog/72.27.1848.1053@72.27.1848.1053" timestamp="1599876558704" />
+    <state x="659" y="259" width="672" height="678" key="search.everywhere.popup" timestamp="1599874163715">
+      <screen x="72" y="27" width="1848" height="1053" />
+    </state>
+    <state x="659" y="259" width="672" height="678" key="search.everywhere.popup/72.27.1848.1053@72.27.1848.1053" timestamp="1599874163715" />
   </component>
 </project>

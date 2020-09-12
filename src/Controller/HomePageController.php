@@ -2,11 +2,14 @@
 
 namespace App\Controller;
 
+use App\Entity\User;
+use App\Form\UserType;
 use JMS\Serializer\SerializerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
-class HomePageController extends AbstractController
+class HomePageController extends ApiController
 {
 
     /**
@@ -20,7 +23,7 @@ class HomePageController extends AbstractController
         }
 
         return $this->render('base.html.twig', [
-            'user' => null
+            'user' => null,
         ]);
     }
 }

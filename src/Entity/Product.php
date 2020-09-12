@@ -4,13 +4,11 @@ namespace App\Entity;
 
 use App\Repository\ProductRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
-use JMS\Serializer\Annotation as Serializer;
 
 /**
- * @Serializer\ExclusionPolicy()
  * @ORM\Entity(repositoryClass=ProductRepository::class)
- *
  */
 class Product
 {
@@ -18,7 +16,7 @@ class Product
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
-     * @Serializer\MaxDepth(1)
+     * @Groups("user")
      */
     private $id;
 
@@ -27,7 +25,7 @@ class Product
      * @Assert\Type("string")
      * @Assert\Length(min=3, max=50)
      * @ORM\Column(type="string", length=255)
-     * @Serializer\MaxDepth(1)
+     * @Groups("user")
      */
     private $name;
 
@@ -35,16 +33,16 @@ class Product
      * @Assert\NotBlank()
      * @Assert\GreaterThanOrEqual(0)
      * @ORM\Column(type="integer")
-     * @Serializer\MaxDepth(1)
+     * @Groups("user")
      */
     private $kcal;
 
     /**
-     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="products")
+     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="products", cascade="remove")
      * @ORM\JoinColumn(nullable=false)
-     * @Serializer\MaxDepth(1)
      */
     private $owner;
+
 
     public function getId(): ?int
     {
@@ -75,21 +73,17 @@ class Product
         return $this;
     }
 
-    /**
-     * @Serializer\MaxDepth(1)
-     */
     public function getOwner(): ?User
     {
         return $this->owner;
     }
 
-    /**
-     * @Serializer\MaxDepth(1)
-     */
     public function setOwner(?User $owner): self
     {
         $this->owner = $owner;
 
         return $this;
     }
+
+
 }

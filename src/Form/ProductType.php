@@ -15,7 +15,6 @@ class ProductType extends AbstractType
         $builder
             ->add('name')
             ->add('kcal')
-            ->add('owner')
         ;
     }
 
@@ -24,7 +23,6 @@ class ProductType extends AbstractType
         $resolver->setDefaults([
             'data_class' => Product::class,
             'csrf_protection' => false,
-            'allow_extra_fields' => true,
         ]);
     }
 }
