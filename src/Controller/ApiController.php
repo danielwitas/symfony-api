@@ -1,11 +1,13 @@
 <?php
 
-
 namespace App\Controller;
-
 
 use App\Api\ApiProblem;
 use App\Exception\ApiProblemException;
+use App\Mailer\Mailer;
+use App\Pagination\PaginationFactory;
+use App\Security\TokenGenerator;
+use App\Security\UserConfirmationService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormInterface;
@@ -18,16 +20,33 @@ class ApiController extends AbstractController
     protected $entityManager;
     protected $userPasswordEncoder;
     protected $serializer;
+    protected $paginationFactory;
+    protected $tokenGenerator;
+    protected $userConfirmationService;
+    protected $mailer;
 
     public function __construct(
         EntityManagerInterface $entityManager,
         UserPasswordEncoderInterface $userPasswordEncoder,
-        SerializerInterface $serializer
+        SerializerInterface $serializer,
+        PaginationFactory $paginationFactory,
+        TokenGenerator $tokenGenerator,
+        UserConfirmationService $userConfirmationService,
+        Mailer $mailer
     )
     {
         $this->entityManager = $entityManager;
         $this->userPasswordEncoder = $userPasswordEncoder;
         $this->serializer = $serializer;
+        $this->paginationFactory = $paginationFactory;
+        $this->tokenGenerator = $tokenGenerator;
+        $this->userConfirmationService = $userConfirmationService;
+        $this->mailer = $mailer;
+    }
+
+    protected function createApiResponse($data, $statusCode = Response::HTTP_OK)
+    {
+        return $this->json($data, $statusCode, ['Content-Type' => 'application/json']);
     }
 
     protected function throwApiProblemValidationException(FormInterface $form)
@@ -66,7 +85,7 @@ class ApiController extends AbstractController
 
     protected function getErrorsFromForm(FormInterface $form)
     {
-        $errors = array();
+        $errors = [];
         foreach ($form->getErrors() as $error) {
             $errors[] = $error->getMessage();
         }

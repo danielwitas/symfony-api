@@ -15,7 +15,7 @@ class ApiProblem
     private $statusCode;
     private $type;
     private $title;
-    private $extraData = array();
+    private $extraData = [];
     public function __construct($statusCode, $type = null)
     {
         $this->statusCode = $statusCode;
@@ -39,11 +39,11 @@ class ApiProblem
     {
         return array_merge(
             $this->extraData,
-            array(
+            [
                 'status' => $this->statusCode,
                 'type' => $this->type,
                 'title' => $this->title,
-            )
+            ]
         );
     }
     public function set($name, $value)

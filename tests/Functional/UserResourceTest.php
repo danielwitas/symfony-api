@@ -4,8 +4,10 @@
 namespace App\Tests\Functional;
 
 
+use App\Entity\User;
 use App\Test\CustomApiTestCase;
 use Hautelook\AliceBundle\PhpUnit\ReloadDatabaseTrait;
+use Symfony\Component\HttpFoundation\Response;
 
 class UserResourceTest extends CustomApiTestCase
 {
@@ -22,8 +24,16 @@ class UserResourceTest extends CustomApiTestCase
                 'repeatPassword' => 'Password123',
             ]
         ]);
-        $this->assertResponseStatusCodeSame(201);
+        $this->assertResponseStatusCodeSame(Response::HTTP_CREATED);
         $this->login($client, 'example', 'Password123');
+        $this->assertResponseStatusCodeSame(Response::HTTP_UNAUTHORIZED);
+        $em = self::$container->get('doctrine')->getManager();
+        $user = $em->getRepository(User::class)->findOneBy(['username' => 'example']);
+        $user->setEnabled(true);
+        $em->flush();
+        $this->login($client, 'example', 'Password123');
+        $this->assertResponseStatusCodeSame(Response::HTTP_OK);
+
     }
 
     public function testGetUserCollection()
@@ -37,18 +47,15 @@ class UserResourceTest extends CustomApiTestCase
         //dd($client->getResponse()->getContent(false));
         $data = $client->getResponse()->getContent(false);
         $data =json_decode($data, true);
-//        $this->assertJsonContains([
-//            $data[0]['username'] => 'example0'
-//        ]);
-        //dd($data);
         $this->assertCount(10, $data['users']);
-        $this->assertEquals($data['users'][5]['username'], 'example5');
+        $this->assertEquals($data['users'][5]['username'], 'example13');
         $this->assertEquals($data['total'], 25);
         $this->assertEquals($data['count'], 10);
-        $this->assertArrayHasKey('_links.next', $data);
-
-
-
+        $this->assertArrayHasKey('links', $data);
+        $this->assertArrayHasKey('self', $data['links']);
+        $this->assertArrayHasKey('first', $data['links']);
+        $this->assertArrayHasKey('last', $data['links']);
+        $this->assertArrayHasKey('next', $data['links']);
     }
 
     public function testUserChangePassword()
@@ -80,6 +87,7 @@ class UserResourceTest extends CustomApiTestCase
 }
 EOF;
         $client = self::createClient();
+        $user = $this->createUserAndLogin($client, 'example','example@example.com', 'Password123');
         $client->request('POST', '/users', [
             'json' => [
                 $invalidJson
@@ -102,7 +110,8 @@ EOF;
         $this->assertJsonContains([
             'status' => 404,
             'type' => 'about:blank',
-            'title' => 'Not Found'
+            'title' => 'Not Found',
+            'detail' => 'No user found with id 999'
         ]);
     }
 

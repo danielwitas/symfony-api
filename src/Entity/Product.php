@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Annotation\Link;
 use App\Repository\ProductRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -9,8 +10,18 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=ProductRepository::class)
+ * @Link(
+ *     "self",
+ *     route = "products_get_item",
+ *     params = {"id": "object.getId()"}
+ * )
+ * @Link(
+ *     "owner",
+ *     route = "users_get_item",
+ *     params = {"id": "object.getOwner().getId()"}
+ * )
  */
-class Product
+class Product implements ApiEntityInterface
 {
     /**
      * @ORM\Id()
@@ -23,7 +34,8 @@ class Product
     /**
      * @Assert\NotBlank()
      * @Assert\Type("string")
-     * @Assert\Length(min=3, max=50)
+     * @Assert\Length(min=3, max=20)
+     * @Assert\Type(type="alnum")
      * @ORM\Column(type="string", length=255)
      * @Groups("user")
      */
@@ -32,13 +44,15 @@ class Product
     /**
      * @Assert\NotBlank()
      * @Assert\GreaterThanOrEqual(0)
+     * @Assert\Length(max=20)
+     * @Assert\Type(type="numeric")
      * @ORM\Column(type="integer")
      * @Groups("user")
      */
     private $kcal;
 
     /**
-     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="products", cascade="remove")
+     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="products", cascade={"remove", "persist"})
      * @ORM\JoinColumn(nullable=false)
      */
     private $owner;

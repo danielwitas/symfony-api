@@ -19,6 +19,16 @@ class ProductRepository extends ServiceEntityRepository
         parent::__construct($registry, Product::class);
     }
 
+    public function findAllQueryBuilder($filter = '')
+    {
+        $qb = $this->createQueryBuilder('user');
+        if($filter) {
+            $qb->andWhere('user.username LIKE :filter')
+                ->setParameter('filter', '%'.$filter.'%');
+        }
+        return $qb;
+    }
+
     // /**
     //  * @return Product[] Returns an array of Product objects
     //  */

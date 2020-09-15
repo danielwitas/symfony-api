@@ -2,6 +2,7 @@
 
 namespace App\Security\Voter;
 
+use App\Entity\Product;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 use Symfony\Component\Security\Core\Security;
@@ -19,8 +20,8 @@ class ProductVoter extends Voter
     {
         // replace with your own logic
         // https://symfony.com/doc/current/security/voters.html
-        return in_array($attribute, ['EDIT'])
-            && $subject instanceof \App\Entity\Product;
+        return in_array($attribute, ['OWNER'])
+            && $subject instanceof Product;
     }
 
     protected function voteOnAttribute($attribute, $subject, TokenInterface $token)
@@ -31,15 +32,19 @@ class ProductVoter extends Voter
             return false;
         }
 
+
         // ... (check conditions and return true to grant permission) ...
         switch ($attribute) {
-            case 'EDIT':
-                if($subject->getOwner()===$user){
+            case 'OWNER':
+
+                if ($subject->getOwner() === $user) {
                     return true;
                 }
-                if($this->security->isGranted('ROLE_ADMIN')) {
+
+                if ($this->security->isGranted('ROLE_ADMIN')) {
                     return true;
                 }
+
                 return false;
         }
 

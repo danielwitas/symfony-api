@@ -3,14 +3,11 @@
 
 namespace App\Controller;
 
-
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 class SecurityController extends ApiController
 {
-
     /**
      * @Route("/login", name="app_login", methods={"POST"})
      */
@@ -21,6 +18,7 @@ class SecurityController extends ApiController
                 'error' => 'Invalid login request: check that the Content-Type header is "application/json"'
             ], Response::HTTP_BAD_REQUEST);
         }
+        $this->redirectToRoute('home_page');
         return $this->json([
             'info' => 'You have logged in successfully.'
         ], Response::HTTP_OK);
@@ -33,4 +31,24 @@ class SecurityController extends ApiController
     {
         
     }
+
+    /**
+     * @Route("/confirm-user/{token}", name="app_confirm_user", methods="GET")
+     */
+    public function userRegisterConfirmation(string $token)
+    {
+        $this->userConfirmationService->confirmUser($token);
+        return $this->redirectToRoute('home_page');
+    }
+
+    /**
+     * @Route("/user-password-reset-confirm/{token}", name="app_confirm_password_reset", methods="GET")
+     */
+    public function userPasswordResetConfirm(string $token)
+    {
+        $this->userConfirmationService->confirmUser($token);
+        return $this->redirectToRoute('home_page');
+    }
+
+
 }

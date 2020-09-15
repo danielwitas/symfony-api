@@ -10,6 +10,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
+use App\Annotation\Link;
 
 /**
  * @ORM\Entity(repositoryClass=UserRepository::class)
@@ -23,8 +24,18 @@ use Symfony\Component\Validator\Constraints as Assert;
  *     message="This username already exists.",
  *     groups={"registration"}
  * )
+ * @Link(
+ *     "self",
+ *     route = "users_get_item",
+ *     params = {"id": "object.getId()"}
+ * )
+ * @Link(
+ *     "products",
+ *     route = "users_products",
+ *     params = {"id": "object.getId()"}
+ * )
  */
-class User implements UserInterface
+class User implements UserInterface, ApiEntityInterface
 {
     /**
      * @ORM\Id
@@ -38,6 +49,7 @@ class User implements UserInterface
      * @Assert\NotBlank(groups={"registration"})
      * @Assert\NotNull(groups={"registration"})
      * @Assert\Length(min=3, max=50)
+     * @Assert\Type(type="alnum")
      * @ORM\Column(type="string", length=255)
      * @Groups("user")
      */
@@ -45,9 +57,9 @@ class User implements UserInterface
 
     /**
      * @ORM\Column(type="string", length=180, unique=true)
-     * @Assert\NotBlank(groups={"registration"})
-     * @Assert\NotNull(groups={"registration"})
-     * @Assert\Email(groups={"registration"})
+     * @Assert\NotBlank(groups={"registration", "reset-password"})
+     * @Assert\NotNull(groups={"registration", "reset-password"})
+     * @Assert\Email(groups={"registration", "reset-password"})
      * @Groups("user")
      */
     private $email;
@@ -106,6 +118,15 @@ class User implements UserInterface
      */
     private $products;
 
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $enabled;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $confirmationToken;
 
 
     public function __construct()
@@ -255,6 +276,35 @@ class User implements UserInterface
         }
 
         return $this;
+    }
+
+    public function getEnabled(): ?bool
+    {
+        return $this->enabled;
+    }
+
+    public function setEnabled(bool $enabled): self
+    {
+        $this->enabled = $enabled;
+
+        return $this;
+    }
+
+    public function getConfirmationToken(): ?string
+    {
+        return $this->confirmationToken;
+    }
+
+    public function setConfirmationToken(?string $confirmationToken): self
+    {
+        $this->confirmationToken = $confirmationToken;
+
+        return $this;
+    }
+
+    public function __toString(): string
+    {
+        return $this->username;
     }
 
 }

@@ -24,19 +24,19 @@ class ProductNormalizer implements ContextAwareNormalizerInterface
         $context['groups'][] = 'user';
         $data = $this->normalizer->normalize($object, $format, $context);
 
-        // Here, add, edit, or delete some data:
         $data['href']['self'] = $this->router->generate('products_get_item', [
             'id' => $object->getId(),
-        ], UrlGeneratorInterface::ABSOLUTE_URL);
+        ], UrlGeneratorInterface::ABSOLUTE_PATH);
         $data['href']['owner'] = $this->router->generate('users_get_item', [
             'id' => $object->getOwner()->getId(),
-        ], UrlGeneratorInterface::ABSOLUTE_URL);
+        ], UrlGeneratorInterface::ABSOLUTE_PATH);
 
         return $data;
     }
 
     public function supportsNormalization($data, string $format = null, array $context = [])
     {
+        return false;
         return $data instanceof Product;
     }
 }

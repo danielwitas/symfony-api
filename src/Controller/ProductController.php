@@ -14,43 +14,40 @@ class ProductController extends ApiController
     /**
      * @Route("/products/{id}", name="products_get_item", methods="GET", requirements={"id"="\d+"})
      */
-    public function item(Product $product)
+    public function item(int $id)
     {
-        return $this->json(
-            $product,
-            Response::HTTP_OK,
-            ['Content-Type' => 'application/json']
-        );
+        $product = $this->entityManager->getRepository(Product::class)->findOneBy(['id' => $id]);
+        if(!$product) {
+            throw $this->createNotFoundException(sprintf('No product found with id %d', $id));
+        }
+        return $this->createApiResponse($product);
     }
 
     /**
      * @Route("/products", name="products_get_collection", methods="GET")
      */
-    public function collection()
+    public function collection(Request $request)
     {
-        $products = $this->entityManager->getRepository(Product::class)->findAll();
-        return $this->json(
-            $products,
-            Response::HTTP_OK,
-            ['Content-Type' => 'application/json']
-        );
+        $filter = $request->query->get('filter');
+        $qb = $this->entityManager->getRepository(Product::class)->findAllQueryBuilder($filter);
+        $paginatedCollection = $this->paginationFactory->createCollection($qb, $request, 'products_get_collection');
+        return $this->createApiResponse($paginatedCollection->getResult('products'));
     }
 
     /**
      * @Route("/products/{id}", name="products_delete_item", methods="DELETE", requirements={"id"="\d+"})
      */
-    public function delete(Product $product)
+    public function delete(int $id)
     {
+        $product = $this->entityManager->getRepository(Product::class)->findOneBy(['id' => $id]);
+        $this->denyAccessUnlessGranted('OWNER', $product);
+        if(!$product) {
+            throw $this->createNotFoundException(sprintf('No product found with id %d', $id));
+        }
         $this->entityManager->remove($product);
         $this->entityManager->flush();
-        return $this->json(
-            ['info' => 'Product has been deleted.'],
-            Response::HTTP_OK,
-            ['Content-Type' => 'application/json']
-        );
+        return $this->createApiResponse(['info' => 'Product has been deleted']);
     }
-
-
 
     /**
      * @Route("/products", name="products_post_item", methods="POST")
@@ -64,60 +61,30 @@ class ProductController extends ApiController
         $form->submit($data);
         $this->isFormValid($form);
 
-        $user = $this->entityManager->getRepository(User::class)->find(4);
+        $user = $this->getUser();
         $form->getData()->setOwner($user);
 
         $this->entityManager->persist($form->getData());
         $this->entityManager->flush();
-        return $this->json(
-            ['info' => 'Product has been added.'],
-            Response::HTTP_CREATED,
-            ['Content-Type' => 'application/json']
-        );
-
-    }
-
-    /**
-     * @Route("/products/{id}", name="products_put_item", methods="PUT", requirements={"id"="\d+"})
-     */
-    public function put(Request $request, Product $product)
-    {
-        //$this->denyAccessUnlessGranted('ROLE_USER');
-        $data = $this->jsonDecode($request->getContent());
-        $this->isJsonValid($data);
-        $existingProduct = $this->entityManager->getRepository(Product::class)->find($product->getId());
-        $form = $this->createForm(ProductType::class, $existingProduct);
-        $form->submit($data);
-        $this->isFormValid($form);
-
-        $user = $this->entityManager->getRepository(User::class)->find($this->getUser()->getId());
-        $form->getData()->setOwner($user);
-        $this->entityManager->flush();
-        return $this->json(
-            ['info' => 'Product has been updated.'],
-            Response::HTTP_OK,
-            ['Content-Type' => 'application/json']
-        );
+        return $this->createApiResponse(['info' => 'Product has been added'], Response::HTTP_CREATED);
     }
 
     /**
      * @Route("/products/{id}", name="products_patch_item", methods="PATCH", requirements={"id"="\d+"})
      */
-    public function patch(Request $request, Product $product)
+    public function patch(Request $request, int $id)
     {
-
+        $existingProduct = $this->entityManager->getRepository(Product::class)->findOneBy(['id'=>$id]);
+        $this->denyAccessUnlessGranted('OWNER', $existingProduct);
+        if(!$existingProduct) {
+            throw $this->createNotFoundException(sprintf('No product found with id %d', $id));
+        }
         $data = $this->jsonDecode($request->getContent());
         $this->isJsonValid($data);
-        $existingProduct = $this->entityManager->getRepository(Product::class)->find($product->getId());
         $form = $this->createForm(ProductType::class, $existingProduct);
-        $this->denyAccessUnlessGranted('EDIT', $existingProduct);
         $form->submit($data, false);
         $this->isFormValid($form);
         $this->entityManager->flush();
-        return $this->json(
-            ['info' => 'Product has been updated.'],
-            Response::HTTP_OK,
-            ['Content-Type' => 'application/json']
-        );
+        return $this->createApiResponse(['info' => 'Product has been updated']);
     }
 }

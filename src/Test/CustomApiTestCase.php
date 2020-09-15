@@ -15,6 +15,7 @@ class CustomApiTestCase extends ApiTestCase
         $user = new User();
         $user->setUsername($username);
         $user->setEmail($email);
+        $user->setEnabled(true);
         $encoded = self::$container->get('security.password_encoder')
             ->encodePassword($user, $password);
         $user->setPassword($encoded);
@@ -31,7 +32,6 @@ class CustomApiTestCase extends ApiTestCase
                 'password' => $password,
             ],
         ]);
-        $this->assertResponseStatusCodeSame(200);
     }
 
     protected function createUserAndLogin(Client $client, string $username, string $email, string $password) {
