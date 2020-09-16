@@ -8,6 +8,7 @@ use App\Mailer\Mailer;
 use App\Pagination\PaginationFactory;
 use App\Security\TokenGenerator;
 use App\Security\UserConfirmationService;
+use App\Security\UserPasswordResetService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormInterface;
@@ -24,6 +25,7 @@ class ApiController extends AbstractController
     protected $tokenGenerator;
     protected $userConfirmationService;
     protected $mailer;
+    protected $userPasswordResetService;
 
     public function __construct(
         EntityManagerInterface $entityManager,
@@ -32,6 +34,7 @@ class ApiController extends AbstractController
         PaginationFactory $paginationFactory,
         TokenGenerator $tokenGenerator,
         UserConfirmationService $userConfirmationService,
+        UserPasswordResetService $userPasswordResetService,
         Mailer $mailer
     )
     {
@@ -42,6 +45,7 @@ class ApiController extends AbstractController
         $this->tokenGenerator = $tokenGenerator;
         $this->userConfirmationService = $userConfirmationService;
         $this->mailer = $mailer;
+        $this->userPasswordResetService = $userPasswordResetService;
     }
 
     protected function createApiResponse($data, $statusCode = Response::HTTP_OK)

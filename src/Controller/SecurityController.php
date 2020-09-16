@@ -46,7 +46,7 @@ class SecurityController extends ApiController
      */
     public function userPasswordResetConfirm(string $token)
     {
-        $this->userConfirmationService->confirmUser($token);
+        $this->userPasswordResetService->resetPassword($token);
         return $this->redirectToRoute('home_page');
     }
 

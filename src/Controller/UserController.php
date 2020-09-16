@@ -133,6 +133,7 @@ class UserController extends ApiController
             throw $this->createNotFoundException(sprintf('Could not find user with e-mail %s', $form->getData()->getEmail()));
         }
         $user->setConfirmationToken($this->tokenGenerator->getRandomSecureToken());
+        $this->entityManager->flush();
         $this->mailer->sendPasswordResetEmail($user);
         return $this->json(
             ['info' => 'E-mail with instructions to reset password has been sent.'],

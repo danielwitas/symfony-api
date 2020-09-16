@@ -39,4 +39,17 @@ class Mailer
             ->setBody($body);
         $this->mailer->send($message);
     }
+
+    public function sendNewPassword(User $user, string $password)
+    {
+        $body = $this->twig->render('email/new-password.html.twig', [
+            'user' => $user,
+            'password' => $password
+        ]);
+        $message = (new \Swift_Message('New Password!'))
+            ->setFrom('hondacivic555@gmail.com')
+            ->setTo($user->getEmail())
+            ->setBody($body);
+        $this->mailer->send($message);
+    }
 }
