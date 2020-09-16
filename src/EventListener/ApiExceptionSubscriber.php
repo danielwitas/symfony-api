@@ -33,7 +33,6 @@ class ApiExceptionSubscriber implements EventSubscriberInterface
 
     public function onKernelException(ExceptionEvent $event)
     {
-        return;
         $e = $event->getThrowable();
 
         $statusCode = $e instanceof HttpExceptionInterface ? $e->getStatusCode() : 500;
