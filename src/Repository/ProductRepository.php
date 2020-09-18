@@ -21,9 +21,9 @@ class ProductRepository extends ServiceEntityRepository
 
     public function findAllQueryBuilder($filter = '')
     {
-        $qb = $this->createQueryBuilder('user');
+        $qb = $this->createQueryBuilder('product');
         if($filter) {
-            $qb->andWhere('user.username LIKE :filter')
+            $qb->andWhere('product.name LIKE :filter')
                 ->setParameter('filter', '%'.$filter.'%');
         }
         return $qb;

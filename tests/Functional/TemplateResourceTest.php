@@ -3,56 +3,55 @@
 
 namespace App\Tests\Functional;
 
+
 use App\Entity\Product;
+use App\Entity\Template;
 use App\Test\CustomApiTestCase;
 use Doctrine\ORM\EntityManagerInterface;
 use Hautelook\AliceBundle\PhpUnit\ReloadDatabaseTrait;
 use Symfony\Component\HttpFoundation\Response;
 
-class ProductResourceTest extends CustomApiTestCase
+class TemplateResourceTest extends CustomApiTestCase
 {
     use ReloadDatabaseTrait;
 
-    public function testGetExistingSingleProduct()
+    public function testGetExistingSingleTemplate()
     {
         $client = self::createClient();
         $user = $this->createUser('user1', 'user1@example.com', 'foo');
-        $product = new Product();
-        $product->setName('banana');
-        $product->setKcal(100);
-        $product->setOwner($user);
-        $this->getEntityManager()->persist($product);
+        $template = new Template();
+        $template->setName('example');
+        $template->setOwner($user);
+        $this->getEntityManager()->persist($template);
         $this->getEntityManager()->flush();
-        $client->request('GET', '/products/1');
+        $client->request('GET', '/templates/1');
         $this->assertResponseHasHeader('Content-Type', 'application/json');
         $this->assertResponseStatusCodeSame(Response::HTTP_OK);
         $this->assertJsonContains([
-            'kcal' => 100,
-            'name' => 'banana'
+            'name' => 'example'
         ]);
     }
 
-    public function testGetNotExistingSingleProduct()
+    public function testGetNotExistingSingleTemplate()
     {
         $client = self::createClient();
-        $client->request('GET', '/products/1');
+        $client->request('GET', '/templates/1');
         $this->assertResponseHasHeader('Content-Type', 'application/problem+json');
         $this->assertResponseStatusCodeSame(Response::HTTP_NOT_FOUND);
         $this->assertJsonContains([
-            "detail" => "No product found with id 1",
+            "detail" => "No template found with id 1",
             "status" => 404,
             "type" => "about:blank",
             "title" => "Not Found"
         ]);
     }
 
-    public function testPostProductWhenUnauthorized()
+    public function testPostTemplateWhenUnauthorized()
     {
         $client = self::createClient();
-        $client->request('POST', '/products', [
+        $client->request('POST', '/templates', [
             'json' => [
-                'name' => 'banana',
-                'kcal' => 100
+                'name' => 'example',
             ],
         ]);
         $this->assertResponseHasHeader('Content-Type', 'application/problem+json');
@@ -63,27 +62,26 @@ class ProductResourceTest extends CustomApiTestCase
         ]);
     }
 
-    public function testPostProductWhenAuthorized()
+    public function testPostTemplateWhenAuthorized()
     {
         $client = self::createClient();
         $this->createUserAndLogin($client, 'user1', 'user1@example.com', 'foo');
-        $client->request('POST', '/products', [
+        $client->request('POST', '/templates', [
             'json' => [
-                'name' => 'banana',
-                'kcal' => 100
+                'name' => 'example',
             ],
         ]);
         $this->assertResponseHasHeader('Content-Type', 'application/json');
         $this->assertResponseStatusCodeSame(Response::HTTP_CREATED);
         $this->assertJsonContains([
-            "info" => 'Product has been added'
+            "info" => 'Template has been added'
         ]);
     }
 
-    public function testDeleteNotExistingProductWhenUnauthorized()
+    public function testDeleteNotExistingTemplateWhenUnauthorized()
     {
         $client = self::createClient();
-        $client->request('DELETE', '/products/1');
+        $client->request('DELETE', '/templates/1');
         $this->assertResponseHasHeader('Content-Type', 'application/problem+json');
         $this->assertResponseStatusCodeSame(Response::HTTP_UNAUTHORIZED);
         $this->assertJsonContains([
@@ -92,11 +90,11 @@ class ProductResourceTest extends CustomApiTestCase
         ]);
     }
 
-    public function testDeleteNotExistingProductWhenAuthorized()
+    public function testDeleteNotExistingTemplateWhenAuthorized()
     {
         $client = self::createClient();
         $this->createUserAndLogin($client, 'user1', 'user1@example.com', 'foo');
-        $client->request('DELETE', '/products/1');
+        $client->request('DELETE', '/templates/1');
         $this->assertResponseHasHeader('Content-Type', 'application/problem+json');
         $this->assertResponseStatusCodeSame(Response::HTTP_FORBIDDEN);
         $this->assertJsonContains([
@@ -107,37 +105,35 @@ class ProductResourceTest extends CustomApiTestCase
         ]);
     }
 
-    public function testDeleteExistingProductWhenUserIsOwner()
+    public function testDeleteExistingTemplateWhenUserIsOwner()
     {
         $client = self::createClient();
         $user = $this->createUserAndLogin($client, 'user1', 'user1@example.com', 'foo');
-        $product = new Product();
-        $product->setName('banana');
-        $product->setKcal(100);
-        $product->setOwner($user);
-        $this->getEntityManager()->persist($product);
+        $template = new Template();
+        $template->setName('example');
+        $template->setOwner($user);
+        $this->getEntityManager()->persist($template);
         $this->getEntityManager()->flush();
-        $client->request('DELETE', '/products/1');
+        $client->request('DELETE', '/templates/1');
         $this->assertResponseHasHeader('Content-Type', 'application/json');
         $this->assertResponseStatusCodeSame(Response::HTTP_OK);
         $this->assertJsonContains([
-            "info" => "Product has been deleted"
+            "info" => "Template has been deleted"
         ]);
 
     }
 
-    public function testDeleteExistingProductWhenUserIsNotOwner()
+    public function testDeleteExistingTemplateWhenUserIsNotOwner()
     {
         $client = self::createClient();
-        $user1 = $this->createUser('user1', 'user1@example.com', 'foo');
-        $product = new Product();
-        $product->setName('banana');
-        $product->setKcal(100);
-        $product->setOwner($user1);
-        $this->getEntityManager()->persist($product);
+        $user1 = $this->createUser( 'user1', 'user1@example.com', 'foo');
+        $template = new Template();
+        $template->setName('example');
+        $template->setOwner($user1);
+        $this->getEntityManager()->persist($template);
         $this->getEntityManager()->flush();
         $this->createUserAndLogin($client, 'user2', 'user2@example.com', 'foo');
-        $client->request('DELETE', '/products/1');
+        $client->request('DELETE', '/templates/1');
         $this->assertResponseHasHeader('Content-Type', 'application/problem+json');
         $this->assertResponseStatusCodeSame(Response::HTTP_FORBIDDEN);
         $this->assertJsonContains([
@@ -148,33 +144,32 @@ class ProductResourceTest extends CustomApiTestCase
         ]);
     }
 
-    public function testDeleteExistingProductWhenUserIsAdmin()
+    public function testDeleteExistingTemplateWhenUserIsAdmin()
     {
         $client = self::createClient();
-        $user1 = $this->createUser('user1', 'user1@example.com', 'foo');
-        $user2 = $this->createUser('user2', 'user2@example.com', 'foo');
-        $product = new Product();
-        $product->setName('banana');
-        $product->setKcal(100);
-        $product->setOwner($user1);
-        $this->getEntityManager()->persist($product);
+        $user1 = $this->createUser( 'user1', 'user1@example.com', 'foo');
+        $user2 = $this->createUser( 'user2', 'user2@example.com', 'foo');
         $user2->setRoles(['ROLE_ADMIN']);
+        $template = new Template();
+        $template->setName('example');
+        $template->setOwner($user1);
+        $this->getEntityManager()->persist($template);
         $this->getEntityManager()->flush();
         $this->login($client, 'user2', 'foo');
         $this->assertResponseHasHeader('Content-Type', 'application/json');
         $this->assertResponseStatusCodeSame(Response::HTTP_OK);
-        $client->request('DELETE', '/products/1');
+        $client->request('DELETE', '/templates/1');
         $this->assertResponseHasHeader('Content-Type', 'application/json');
         $this->assertResponseStatusCodeSame(Response::HTTP_OK);
         $this->assertJsonContains([
-            "info" => "Product has been deleted"
+            "info" => "Template has been deleted"
         ]);
     }
 
-    public function testPatchNotExistingProductWhenUnauthorized()
+    public function testPatchNotExistingTemplateWhenUnauthorized()
     {
         $client = self::createClient();
-        $client->request('PATCH', '/products/1');
+        $client->request('PATCH', '/templates/1');
         $this->assertResponseHasHeader('Content-Type', 'application/problem+json');
         $this->assertResponseStatusCodeSame(Response::HTTP_UNAUTHORIZED);
         $this->assertJsonContains([
@@ -183,11 +178,11 @@ class ProductResourceTest extends CustomApiTestCase
         ]);
     }
 
-    public function testPatchNotExistingProductWhenAuthorized()
+    public function testPatchNotExistingTemplateWhenAuthorized()
     {
         $client = self::createClient();
         $this->createUserAndLogin($client, 'user1', 'user1@example.com', 'foo');
-        $client->request('DELETE', '/products/1');
+        $client->request('DELETE', '/templates/1');
         $this->assertResponseHasHeader('Content-Type', 'application/problem+json');
         $this->assertResponseStatusCodeSame(Response::HTTP_FORBIDDEN);
         $this->assertJsonContains([
@@ -198,51 +193,45 @@ class ProductResourceTest extends CustomApiTestCase
         ]);
     }
 
-    public function testPatchExistingProductWhenUserIsOwner()
+    public function testPatchExistingTemplateWhenUserIsOwner()
     {
         $client = self::createClient();
         $user = $this->createUserAndLogin($client, 'user1', 'user1@example.com', 'foo');
-        $product = new Product();
-        $product->setName('banana');
-        $product->setKcal(100);
-        $product->setOwner($user);
-        $this->getEntityManager()->persist($product);
+        $template = new Template();
+        $template->setName('example');
+        $template->setOwner($user);
+        $this->getEntityManager()->persist($template);
         $this->getEntityManager()->flush();
-        $client->request('PATCH', '/products/1', [
+        $client->request('PATCH', '/templates/1', [
             'json' => [
-                'name' => 'apple',
-                'kcal' => 200
+                'name' => 'updated',
             ]]);
         $this->assertResponseHasHeader('Content-Type', 'application/json');
         $this->assertResponseStatusCodeSame(Response::HTTP_OK);
         $this->assertJsonContains([
-            'info' => 'Product has been updated'
+            "info" => "Template has been updated"
         ]);
-        $client->request('GET', '/products/1');
+        $client->request('GET', '/templates/1');
         $this->assertResponseHasHeader('Content-Type', 'application/json');
         $this->assertResponseStatusCodeSame(Response::HTTP_OK);
-        //dd(json_decode($client->getResponse()->getContent()));
         $this->assertJsonContains([
-            'name' => 'apple',
-            'kcal' => 200
+            "name" => "updated"
         ]);
     }
 
-    public function testPatchExistingProductWhenUserIsNotOwner()
+    public function testPatchExistingTemplateWhenUserIsNotOwner()
     {
         $client = self::createClient();
         $user1 = $this->createUser('user1', 'user1@example.com', 'foo');
-        $product = new Product();
-        $product->setName('banana');
-        $product->setKcal(100);
-        $product->setOwner($user1);
-        $this->getEntityManager()->persist($product);
+        $template = new Template();
+        $template->setName('example');
+        $template->setOwner($user1);
+        $this->getEntityManager()->persist($template);
         $this->getEntityManager()->flush();
         $this->createUserAndLogin($client, 'user2', 'user2@example.com', 'foo');
-        $client->request('PATCH', '/products/1', [
+        $client->request('PATCH', '/templates/1', [
             'json' => [
-                'name' => 'apple',
-                'kcal' => 200
+                'name' => 'updated'
             ]]);
         $this->assertResponseHasHeader('Content-Type', 'application/problem+json');
         $this->assertResponseStatusCodeSame(Response::HTTP_FORBIDDEN);
@@ -254,62 +243,40 @@ class ProductResourceTest extends CustomApiTestCase
         ]);
     }
 
-    public function testPatchExistingProductWhenUserIsAdmin()
+    public function testPatchExistingTemplateWhenUserIsAdmin()
     {
         $client = self::createClient();
         $user1 = $this->createUser('user1', 'user1@example.com', 'foo');
         $user2 = $this->createUser('user2', 'user2@example.com', 'foo');
-        $product = new Product();
-        $product->setName('banana');
-        $product->setKcal(100);
-        $product->setOwner($user1);
-        $this->getEntityManager()->persist($product);
         $user2->setRoles(['ROLE_ADMIN']);
+        $template = new Template();
+        $template->setName('example');
+        $template->setOwner($user1);
+        $this->getEntityManager()->persist($template);
         $this->getEntityManager()->flush();
         $this->login($client, 'user2', 'foo');
         $this->assertResponseHasHeader('Content-Type', 'application/json');
         $this->assertResponseStatusCodeSame(Response::HTTP_OK);
-        $client->request('PATCH', '/products/1', [
+        $client->request('PATCH', '/templates/1', [
             'json' => [
-                'name' => 'apple',
-                'kcal' => 200
+                'name' => 'updated',
             ]]);
         $this->assertResponseHasHeader('Content-Type', 'application/json');
         $this->assertResponseStatusCodeSame(Response::HTTP_OK);
         $this->assertJsonContains([
-            "info" => "Product has been updated"
+            "info" => "Template has been updated"
         ]);
     }
 
-    public function testProductPostValidation()
+    public function testTemplatePostValidation()
     {
         $client = self::createClient();
         $this->createUserAndLogin($client, 'user1', 'user1@example.com', 'foo');
-        $client->request('POST', '/products', [
+        $client->request('POST', '/templates', [
             'json' => [
                 'name' => '',
-                'kcal' => ''
             ],
         ]);
-        //dd($client->getResponse()->getContent(false));
-        $this->assertResponseHasHeader('Content-Type', 'application/problem+json');
-        $this->assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST);
-        $this->assertJsonContains([
-            "status" => 400,
-            "type" => "validation_error",
-            "title" => "There was a validation error.",
-            "errors" => [
-                "name" => ["This value should not be blank."],
-                "kcal" => ["This value should not be blank."]
-            ]
-        ]);
-        $client->request('POST', '/products', [
-            'json' => [
-                'name' => '$',
-                'kcal' => '$'
-            ],
-        ]);
-
         $this->assertResponseHasHeader('Content-Type', 'application/problem+json');
         $this->assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST);
         $this->assertJsonContains([
@@ -318,19 +285,30 @@ class ProductResourceTest extends CustomApiTestCase
             "title" => "There was a validation error.",
             "errors" => [
                 "name" => [
-                    "This value is too short. It should have 3 characters or more.",
-                    "This value should be of type alnum.",
-
+                    "This value should not be blank."
                 ],
-                "kcal" => [
-                    "This value is not valid.",
+            ]
+        ]);
+        $client->request('POST', '/templates', [
+            'json' => [
+                'name' => '$$$'
+            ],
+        ]);
+        $this->assertResponseHasHeader('Content-Type', 'application/problem+json');
+        $this->assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST);
+        $this->assertJsonContains([
+            "status" => 400,
+            "type" => "validation_error",
+            "title" => "There was a validation error.",
+            "errors" => [
+                "name" => [
+                    "Name must contain only letters and numbers",
                 ]
             ]
         ]);
-        $client->request('POST', '/products', [
+        $client->request('POST', '/templates', [
             'json' => [
-                'name' => 'a1',
-                'kcal' => '-1'
+                'name' => 'a1'
             ],
         ]);
         $this->assertResponseHasHeader('Content-Type', 'application/problem+json');
@@ -342,48 +320,25 @@ class ProductResourceTest extends CustomApiTestCase
             "errors" => [
                 "name" => [
                     "This value is too short. It should have 3 characters or more.",
-                ],
-                "kcal" => [
-                    "This value should be greater than or equal to 0.",
                 ]
             ]
         ]);
     }
 
-    public function testProductPatchValidation()
+    public function testTemplatePatchValidation()
     {
         $client = self::createClient();
         $user = $this->createUserAndLogin($client, 'user1', 'user1@example.com', 'foo');
-        $product = new Product();
-        $product->setName('banana');
-        $product->setKcal(100);
-        $product->setOwner($user);
-        $this->getEntityManager()->persist($product);
+        $template = new Template();
+        $template->setName('example');
+        $template->setOwner($user);
+        $this->getEntityManager()->persist($template);
         $this->getEntityManager()->flush();
-        $client->request('PATCH', '/products/1', [
+        $client->request('PATCH', '/templates/1', [
             'json' => [
                 'name' => '',
-                'kcal' => ''
             ],
         ]);
-        $this->assertResponseHasHeader('Content-Type', 'application/problem+json');
-        $this->assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST);
-        $this->assertJsonContains([
-            "status" => 400,
-            "type" => "validation_error",
-            "title" => "There was a validation error.",
-            "errors" => [
-                "name" => ["This value should not be blank."],
-                "kcal" => ["This value should not be blank."]
-            ]
-        ]);
-        $client->request('PATCH', '/products/1', [
-            'json' => [
-                'name' => '$',
-                'kcal' => '$'
-            ],
-        ]);
-
         $this->assertResponseHasHeader('Content-Type', 'application/problem+json');
         $this->assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST);
         $this->assertJsonContains([
@@ -392,19 +347,30 @@ class ProductResourceTest extends CustomApiTestCase
             "title" => "There was a validation error.",
             "errors" => [
                 "name" => [
-                    "This value is too short. It should have 3 characters or more.",
-                    "This value should be of type alnum.",
-
+                    "This value should not be blank."
                 ],
-                "kcal" => [
-                    "This value is not valid.",
+            ]
+        ]);
+        $client->request('PATCH', '/templates/1', [
+            'json' => [
+                'name' => '$$$'
+            ],
+        ]);
+        $this->assertResponseHasHeader('Content-Type', 'application/problem+json');
+        $this->assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST);
+        $this->assertJsonContains([
+            "status" => 400,
+            "type" => "validation_error",
+            "title" => "There was a validation error.",
+            "errors" => [
+                "name" => [
+                    "Name must contain only letters and numbers",
                 ]
             ]
         ]);
-        $client->request('PATCH', '/products/1', [
+        $client->request('PATCH', '/templates/1', [
             'json' => [
-                'name' => 'a1',
-                'kcal' => '-1'
+                'name' => 'a1'
             ],
         ]);
         $this->assertResponseHasHeader('Content-Type', 'application/problem+json');
@@ -416,26 +382,22 @@ class ProductResourceTest extends CustomApiTestCase
             "errors" => [
                 "name" => [
                     "This value is too short. It should have 3 characters or more.",
-                ],
-                "kcal" => [
-                    "This value should be greater than or equal to 0.",
                 ]
             ]
         ]);
     }
 
-    public function testPostProductInvalidJson()
+    public function testPostTemplateInvalidJson()
     {
         $invalidJson = <<<EOF
 {
     "name" "example",
-    "kcal" : "2
     
 }
 EOF;
         $client = self::createClient();
         $this->createUserAndLogin($client, 'example', 'example@example.com', 'Password123');
-        $client->request('POST', '/products', [
+        $client->request('POST', '/templates', [
             'json' => [
                 $invalidJson
             ]
@@ -448,26 +410,25 @@ EOF;
             'title' => 'There was a validation error.'
         ]);
 
+
     }
 
-    public function testPatchProductInvalidJson()
+    public function testPatchTemplateInvalidJson()
     {
         $invalidJson = <<<EOF
 {
-    "name" "example",
-    "kcal" : "2
+    "name" "example"
     
 }
 EOF;
         $client = self::createClient();
         $user = $this->createUserAndLogin($client, 'user1', 'user1@example.com', 'foo');
-        $product = new Product();
-        $product->setName('banana');
-        $product->setKcal(100);
-        $product->setOwner($user);
-        $this->getEntityManager()->persist($product);
+        $template = new Template();
+        $template->setName('example');
+        $template->setOwner($user);
+        $this->getEntityManager()->persist($template);
         $this->getEntityManager()->flush();
-        $client->request('PATCH', '/products/1', [
+        $client->request('PATCH', '/templates/1', [
             'json' => [
                 $invalidJson
             ]
@@ -486,5 +447,4 @@ EOF;
     {
         return self::$container->get('doctrine')->getManager();
     }
-
 }

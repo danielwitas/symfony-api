@@ -37,6 +37,11 @@ use App\Annotation\Link;
  */
 class User implements UserInterface, ApiEntityInterface
 {
+
+    const ROLE_USER = 'ROLE_USER';
+    const ROLE_ADMIN = 'ROLE_ADMIN';
+
+    const DEFAULT_ROLES = [self::ROLE_USER];
     /**
      * @ORM\Id
      * @ORM\GeneratedValue
@@ -57,16 +62,17 @@ class User implements UserInterface, ApiEntityInterface
 
     /**
      * @ORM\Column(type="string", length=180, unique=true)
-     * @Assert\NotBlank(groups={"registration", "reset-password"})
-     * @Assert\NotNull(groups={"registration", "reset-password"})
-     * @Assert\Email(groups={"registration", "reset-password"})
-     * @Groups("user")
+     * @Assert\NotBlank(groups={"registration", "reset-password", "change-email"})
+     * @Assert\NotNull(groups={"registration", "reset-password", "change-email"})
+     * @Assert\Email(groups={"registration", "reset-password", "change-email"})
+     * @Groups("admin")
      */
     private $email;
 
     /**
      * @ORM\Column(type="json")
      * @Groups("user")
+     *
      */
     private $roles = [];
 
@@ -112,11 +118,10 @@ class User implements UserInterface, ApiEntityInterface
      */
     private $repeatNewPassword;
 
-
     /**
-     * @ORM\OneToMany(targetEntity=Product::class, mappedBy="owner", cascade={"persist", "remove"})
+     * @ORM\Column(type="integer", nullable=true)
      */
-    private $products;
+    private $passwordChangeDate;
 
     /**
      * @ORM\Column(type="boolean")
@@ -128,10 +133,24 @@ class User implements UserInterface, ApiEntityInterface
      */
     private $confirmationToken;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Template::class, mappedBy="owner", cascade={"persist", "remove"})
+     */
+    private $templates;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Product::class, mappedBy="owner", cascade={"persist", "remove"})
+     */
+    private $products;
+
 
     public function __construct()
     {
         $this->products = new ArrayCollection();
+        $this->roles = self::DEFAULT_ROLES;
+        $this->enabled = false;
+        $this->confirmationToken = null;
+        $this->templates = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -163,23 +182,14 @@ class User implements UserInterface, ApiEntityInterface
         return $this;
     }
 
-    /**
-     * @see UserInterface
-     */
     public function getRoles(): array
     {
-        $roles = $this->roles;
-        // guarantee every user at least has ROLE_USER
-        $roles[] = 'ROLE_USER';
-
-        return array_unique($roles);
+        return $this->roles;
     }
 
-    public function setRoles(array $roles): self
+    public function setRoles(array $roles)
     {
         $this->roles = $roles;
-
-        return $this;
     }
 
     /**
@@ -306,5 +316,52 @@ class User implements UserInterface, ApiEntityInterface
     {
         return $this->username;
     }
+
+    public function getPasswordChangeDate()
+    {
+        return $this->passwordChangeDate;
+    }
+
+    public function setPasswordChangeDate($passwordChangeDate): void
+    {
+        $this->passwordChangeDate = $passwordChangeDate;
+    }
+
+    /**
+     * @return Collection|Template[]
+     */
+    public function getTemplates(): Collection
+    {
+        return $this->templates;
+    }
+
+    public function addTemplate(Template $template): self
+    {
+        if (!$this->templates->contains($template)) {
+            $this->templates[] = $template;
+            $template->setOwner($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTemplate(Template $template): self
+    {
+        if ($this->templates->contains($template)) {
+            $this->templates->removeElement($template);
+            // set the owning side to null (unless already changed)
+            if ($template->getOwner() === $this) {
+                $template->setOwner(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getOwner(): ?UserInterface
+    {
+        return $this;
+    }
+
 
 }

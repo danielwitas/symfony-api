@@ -17,7 +17,7 @@
         <p>Request method: {{ app.request.method }}</p>
         <p>Application Environment: {{ app.environment }}</p>
     {% endif %}
-    <form action="{{ path('app_login') }}" method="post" class="login_form">
+    <form action="{{ path('security_login') }}" method="post" class="login_form">
         email
         <input type="text" name="email" id="email"/>
         <br /><br />
@@ -28,6 +28,7 @@
     </form>
 {% endblock %}
 {% block javascripts %}
+    {{ form(form) }}
     <script
             src="https://code.jquery.com/jquery-3.5.1.js"
             integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc="

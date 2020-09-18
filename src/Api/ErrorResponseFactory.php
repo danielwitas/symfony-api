@@ -6,7 +6,7 @@ namespace App\Api;
 
 use Symfony\Component\HttpFoundation\JsonResponse;
 
-class ResponseFactory
+class ErrorResponseFactory
 {
     public function createResponse(ApiProblem $apiProblem)
     {

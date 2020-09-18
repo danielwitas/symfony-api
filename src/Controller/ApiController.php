@@ -12,6 +12,7 @@ use App\Security\UserPasswordResetService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Symfony\Component\Serializer\SerializerInterface;
@@ -85,6 +86,20 @@ class ApiController extends AbstractController
     protected function jsonDecode($data)
     {
         return json_decode($data, true);
+    }
+
+    protected function processForm(Request $request, FormInterface $form)
+    {
+        $data = json_decode($request->getContent(), true);
+        if($data===null){
+            $apiProblem = new ApiProblem(
+                Response::HTTP_BAD_REQUEST,
+                ApiProblem::TYPE_INVALID_REQUEST_BODY_FORMAT
+            );
+            throw new ApiProblemException($apiProblem);
+        }
+        $clearMissing = $request->getMethod() != 'PATCH';
+        $form->submit($data, $clearMissing);
     }
 
     protected function getErrorsFromForm(FormInterface $form)

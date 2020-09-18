@@ -2,13 +2,13 @@
 
 namespace App\Security\Voter;
 
-use App\Entity\Product;
+use App\Entity\ApiEntityInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Core\User\UserInterface;
 
-class ProductVoter extends Voter
+class ApiEntityVoter extends Voter
 {
     private $security;
 
@@ -21,7 +21,7 @@ class ProductVoter extends Voter
         // replace with your own logic
         // https://symfony.com/doc/current/security/voters.html
         return in_array($attribute, ['OWNER'])
-            && $subject instanceof Product;
+            && $subject instanceof ApiEntityInterface;
     }
 
     protected function voteOnAttribute($attribute, $subject, TokenInterface $token)
@@ -31,23 +31,17 @@ class ProductVoter extends Voter
         if (!$user instanceof UserInterface) {
             return false;
         }
-
-
         // ... (check conditions and return true to grant permission) ...
         switch ($attribute) {
             case 'OWNER':
-
                 if ($subject->getOwner() === $user) {
                     return true;
                 }
-
                 if ($this->security->isGranted('ROLE_ADMIN')) {
                     return true;
                 }
-
                 return false;
         }
-
         throw new \Exception(sprintf('Unhandled attribute "%s"', $attribute));
     }
 }

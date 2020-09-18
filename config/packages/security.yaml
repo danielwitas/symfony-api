@@ -32,16 +32,17 @@ security:
             provider: app_user_provider
 
             json_login:
-                check_path: app_login
+                check_path: security_login
                 username_path: username
                 password_path: password
                 success_handler: lexik_jwt_authentication.handler.authentication_success
                 failure_handler: lexik_jwt_authentication.handler.authentication_failure
             logout:
-                path: app_logout
+                path: security_logout
             guard:
                 authenticators:
-                    - lexik_jwt_authentication.jwt_token_authenticator
+                    - App\Security\TokenAuthenticator
+#                    - lexik_jwt_authentication.jwt_token_authenticator
             user_checker: App\Security\UserEnabledChecker
 
 
@@ -56,3 +57,6 @@ security:
     access_control:
         # - { path: ^/admin, roles: ROLE_ADMIN }
         # - { path: ^/profile, roles: ROLE_USER }
+    role_hierarchy:
+        ROLE_ADMIN: ROLE_USER
+        ROLE_SUPER_ADMIN: [ ROLE_ADMIN, ROLE_ALLOWED_TO_SWITCH ]

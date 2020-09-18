@@ -7,10 +7,16 @@ use Symfony\Component\HttpFoundation\Response;
 class ApiProblem
 {
     const TYPE_VALIDATION_ERROR = 'validation_error';
+    const TYPE_INVALID_CREDENTIALS = 'invalid_credentials';
     const TYPE_INVALID_REQUEST_BODY_FORMAT = 'invalid_body_format';
+    const TYPE_INVALID_CONFIRMATION_TOKEN = 'invalid_confirmation_token';
+    const TYPE_INVALID_LOGIN_REQUEST = 'invalid_login_request';
     private static $titles = array(
         self::TYPE_VALIDATION_ERROR => 'There was a validation error.',
         self::TYPE_INVALID_REQUEST_BODY_FORMAT => 'Invalid JSON format sent',
+        self::TYPE_INVALID_CONFIRMATION_TOKEN => 'Invalid confirmation token',
+        self::TYPE_INVALID_LOGIN_REQUEST => 'Invalid login request: check that the Content-Type header is "application/json"',
+        self::TYPE_INVALID_CREDENTIALS => 'Invalid credentials.'
     );
     private $statusCode;
     private $type;

@@ -62,7 +62,7 @@ class UserResourceTest extends CustomApiTestCase
     {
         $client = self::createClient();
         $user = $this->createUserAndLogin($client, 'example','example@example.com', 'Password123');
-        $client->request('PATCH', '/users/' . $user->getId() . '/change-password', [
+        $client->request('PATCH', '/change-password', [
             'json' => [
                 'password' => 'Password123',
                 'newPassword' => 'Password1234',

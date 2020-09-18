@@ -4,7 +4,9 @@ namespace App\Entity;
 
 use App\Annotation\Link;
 use App\Repository\ProductRepository;
+use Carbon\Carbon;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -52,10 +54,26 @@ class Product implements ApiEntityInterface
     private $kcal;
 
     /**
-     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="products", cascade={"remove", "persist"})
+     * @ORM\Column(type="datetime")
+     * @Groups("user")
+     */
+    private $createdAt;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="products")
      * @ORM\JoinColumn(nullable=false)
      */
     private $owner;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Template::class, inversedBy="products")
+     */
+    private $template;
+
+    public function __construct()
+    {
+        $this->createdAt = new \DateTimeImmutable();
+    }
 
 
     public function getId(): ?int
@@ -87,7 +105,13 @@ class Product implements ApiEntityInterface
         return $this;
     }
 
-    public function getOwner(): ?User
+    public function getCreatedAt(): string
+    {
+        return Carbon::instance($this->createdAt)->diffForHumans();
+    }
+
+
+    public function getOwner(): ?UserInterface
     {
         return $this->owner;
     }
@@ -95,6 +119,18 @@ class Product implements ApiEntityInterface
     public function setOwner(?User $owner): self
     {
         $this->owner = $owner;
+
+        return $this;
+    }
+
+    public function getTemplate(): ?Template
+    {
+        return $this->template;
+    }
+
+    public function setTemplate(?Template $template): self
+    {
+        $this->template = $template;
 
         return $this;
     }

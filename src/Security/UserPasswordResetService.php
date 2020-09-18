@@ -2,11 +2,13 @@
 
 namespace App\Security;
 
+use App\Api\ApiProblem;
 use App\Entity\User;
+use App\Exception\ApiProblemException;
 use App\Mailer\Mailer;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
 class UserPasswordResetService
@@ -37,7 +39,12 @@ class UserPasswordResetService
         /** @var User $user */
         $user = $this->entityManager->getRepository(User::class)->findOneBy(['confirmationToken' => $confirmationToken]);
         if (!$user) {
-            throw new NotFoundHttpException();
+            $apiProblem = new ApiProblem(
+                Response::HTTP_BAD_REQUEST,
+                ApiProblem::TYPE_INVALID_CONFIRMATION_TOKEN
+            );
+            $apiProblem->set('details', 'Invalid confirmation token. Check your token and try again.');
+            throw new ApiProblemException($apiProblem);
         }
         $password = $this->tokenGenerator->getRandomSecureToken();
         $user->setPassword(
@@ -47,5 +54,6 @@ class UserPasswordResetService
         $user->setConfirmationToken(null);
         $this->entityManager->flush();
         $this->mailer->sendNewPassword($user, $password);
+        return ['info' => 'Password has been reset successfully'];
     }
 }

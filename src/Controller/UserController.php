@@ -20,10 +20,7 @@ class UserController extends ApiController
     {
         $user = $this->entityManager->getRepository(User::class)->findOneBy(['id' => $id]);
         if (!$user) {
-            throw $this->createNotFoundException(sprintf(
-                'No user found with id %d',
-                $id
-            ));
+            throw $this->createNotFoundException(sprintf('No user found with id %d', $id));
         }
         return $this->createApiResponse($user);
     }
@@ -46,10 +43,7 @@ class UserController extends ApiController
     {
         $user = $this->entityManager->getRepository(User::class)->findOneBy(['id' => $id]);
         if (!$user) {
-            throw $this->createNotFoundException(sprintf(
-                'No user found with id %d',
-                $id
-            ));
+            throw $this->createNotFoundException(sprintf('No user found with id %d', $id));
         }
         $this->entityManager->remove($user);
         $this->entityManager->flush();
@@ -77,106 +71,21 @@ class UserController extends ApiController
         $this->entityManager->persist($user);
         $this->entityManager->flush();
         $this->mailer->sendConfirmationEmail($user);
-        return $this->createApiResponse(['info' => 'User has been added.'], Response::HTTP_CREATED);
-    }
-
-    /**
-     * @Route("/users/{id}/change-password", name="users_change_password", methods="PATCH")
-     */
-    public function changePassword(Request $request, int $id)
-    {
-        $user = $this->entityManager->getRepository(User::class)->findOneBy(['id' => $id]);
-        if (!$user) {
-            throw $this->createNotFoundException(sprintf(
-                'No user found with id %d',
-                $id
-            ));
-        }
-        $data = $this->jsonDecode($request->getContent());
-        $this->isJsonValid($data);
-        $form = $this->createForm(ChangePasswordType::class, new User());
-        $form->submit($data, false);
-        $this->isFormValid($form);
-        $checkPass = $this->userPasswordEncoder->isPasswordValid($user, $form->getData()->getPassword());
-        if (!$checkPass) {
-            return $this->json(
-                ['error' => 'Invalid password.'],
-                Response::HTTP_FORBIDDEN,
-                ['Content-Type' => 'application/json']
-            );
-        }
-        $user->setPassword(
-            $this->userPasswordEncoder->encodePassword($user, $form->getData()->getNewPassword())
-        );
-        $this->entityManager->persist($user);
-        $this->entityManager->flush();
-
-        return $this->json(
-            ['info' => 'Password has been changed.'],
-            Response::HTTP_OK,
-            ['Content-Type' => 'application/json']
-        );
-    }
-
-    /**
-     * @Route("/user-password-reset", name="app_password_reset", methods="POST")
-     */
-    public function userPasswordReset(Request $request)
-    {
-        $data = $this->jsonDecode($request->getContent());
-        $this->isJsonValid($data);
-        $form = $this->createForm(PasswordResetType::class, new User());
-        $form->submit($data);
-        $this->isFormValid($form);
-        $user = $this->entityManager->getRepository(User::class)->findOneBy(['email' => $form->getData()->getEmail()]);
-        if (!$user) {
-            throw $this->createNotFoundException(sprintf('Could not find user with e-mail %s', $form->getData()->getEmail()));
-        }
-        $user->setConfirmationToken($this->tokenGenerator->getRandomSecureToken());
-        $this->entityManager->flush();
-        $this->mailer->sendPasswordResetEmail($user);
-        return $this->json(
-            ['info' => 'E-mail with instructions to reset password has been sent.'],
-            Response::HTTP_OK,
-            ['Content-Type' => 'application/json']
-        );
-    }
-
-    /**
-     * @Route("/users/{id}/set-role", name="users_set_role", methods="PATCH")
-     */
-    public function setRole(Request $request, User $user)
-    {
-        // add form
-        // add voter
-        return $this->json(['tba' => 'tba']);
-    }
-
-    /**
-     * @Route("/users/{id}/change-email", name="users_change_email", methods="PATCH")
-     */
-    public function changeEmail(Request $request, User $user)
-    {
-        // add form
-        // add voter
-        return $this->json(['tba' => 'tba']);
+        return $this->createApiResponse([
+            'info' => 'Success. Check your e-mail and confirm your accout to complete registration'
+        ], Response::HTTP_CREATED);
     }
 
     /**
      * @Route("/users/{id}/products", name="users_products", methods="GET")
      */
-    public function userProducts(User $user)
+    public function userProducts(int $id)
     {
         $user = $this->entityManager->getRepository(User::class)->findOneBy(['id' => $id]);
         if (!$user) {
-            throw $this->createNotFoundException(sprintf(
-                'No user found with id %d',
-                $id
-            ));
+            throw $this->createNotFoundException(sprintf('No user found with id %d', $id));
         }
         $products = $this->entityManager->getRepository(Product::class)->findBy(['owner' => $user]);
-        // add form
-        // add voter
         return $this->createApiResponse($products);
     }
 
