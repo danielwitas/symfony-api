@@ -4,6 +4,7 @@
 namespace App\Tests\Functional;
 
 use App\Entity\Product;
+use App\Entity\User;
 use App\Test\CustomApiTestCase;
 use Doctrine\ORM\EntityManagerInterface;
 use Hautelook\AliceBundle\PhpUnit\ReloadDatabaseTrait;
@@ -13,35 +14,84 @@ class ProductResourceTest extends CustomApiTestCase
 {
     use ReloadDatabaseTrait;
 
-    public function testGetExistingSingleProduct()
+    private function createProduct(string $name, int $kcal, int $protein, int $carbs, int $fat, User $owner): Product
+    {
+        $product = new Product();
+        $product->setName($name);
+        $product->setKcal($kcal);
+        $product->setProtein($protein);
+        $product->setCarbs($carbs);
+        $product->setFat($fat);
+        $product->setWeight(100);
+        $product->setOwner($owner);
+        $this->getEntityManager()->persist($product);
+        $this->getEntityManager()->flush();
+        return $product;
+    }
+
+    public function testGetExistingSingleProductWhenUnauthorized()
     {
         $client = self::createClient();
         $user = $this->createUser('user1', 'user1@example.com', 'foo');
-        $product = new Product();
-        $product->setName('banana');
-        $product->setKcal(100);
-        $product->setOwner($user);
-        $this->getEntityManager()->persist($product);
-        $this->getEntityManager()->flush();
-        $client->request('GET', '/products/1');
+        $this->createProduct('banana', 1, 1, 1, 1, $user);
+        $client->request('GET', '/api/products/1');
+        $this->assertResponseHasHeader('Content-Type', 'application/problem+json');
+        $this->assertResponseStatusCodeSame(Response::HTTP_UNAUTHORIZED);
+        $this->assertJsonContains([
+            'status' => 401,
+            'detail' => 'Could not find JWT token',
+            "type" => "jwt_token_not_found",
+            "title" => "JWT token not found",
+        ]);
+    }
+
+    public function testGetExistingSingleProductWhenUserIsNotOwner()
+    {
+        $client = self::createClient();
+        $user = $this->createUser('user1', 'user1@example.com', 'foo');
+        $this->createProduct('banana', 1, 1, 1, 1, $user);
+        $this->createUserAndLogin($client, 'user2', 'user2@example.com', 'foo');
+        $client->request('GET', '/api/products/1');
+        $response = $client->getResponse();
+        $this->assertResponseHasHeader('Content-Type', 'application/problem+json');
+        $this->assertResponseStatusCodeSame(Response::HTTP_FORBIDDEN);
+        $this->assertJsonContains([
+            "status" => 403,
+            "type" => "about:blank",
+            "title" => "Forbidden",
+            "detail" => "This product does not belong to you"
+        ]);
+    }
+
+    public function testGetExistingSingleProductWhenOwner()
+    {
+        $client = self::createClient();
+        $user = $this->createUserAndLogin($client, 'user1', 'user1@example.com', 'foo');
+        $this->createProduct('banana', 1, 1, 1, 1, $user);
+        $client->request('GET', '/api/products/1');
         $this->assertResponseHasHeader('Content-Type', 'application/json');
         $this->assertResponseStatusCodeSame(Response::HTTP_OK);
         $this->assertJsonContains([
-            'kcal' => 100,
-            'name' => 'banana'
+            "name" => 'banana',
+            "kcal" => 1,
+            "weight" => 100,
+            "protein" => 1,
+            "carbs" => 1,
+            "fat" => 1,
         ]);
     }
 
     public function testGetNotExistingSingleProduct()
     {
         $client = self::createClient();
-        $client->request('GET', '/products/1');
+        $this->createUserAndLogin($client, 'user1', 'user1@example.com', 'foo');
+        $client->request('GET', '/api/products/1');
         $this->assertResponseHasHeader('Content-Type', 'application/problem+json');
         $this->assertResponseStatusCodeSame(Response::HTTP_NOT_FOUND);
         $this->assertJsonContains([
-            "detail" => "No product found with id 1",
             "status" => 404,
             "type" => "about:blank",
+            "detail" => "Product does not exist",
             "title" => "Not Found"
         ]);
     }
@@ -49,17 +99,22 @@ class ProductResourceTest extends CustomApiTestCase
     public function testPostProductWhenUnauthorized()
     {
         $client = self::createClient();
-        $client->request('POST', '/products', [
+        $client->request('POST', '/api/products', [
             'json' => [
-                'name' => 'banana',
-                'kcal' => 100
+                "name" => 'banana',
+                "kcal" => 1,
+                "protein" => 1,
+                "carbs" => 1,
+                "fat" => 1,
             ],
         ]);
         $this->assertResponseHasHeader('Content-Type', 'application/problem+json');
         $this->assertResponseStatusCodeSame(Response::HTTP_UNAUTHORIZED);
         $this->assertJsonContains([
-            "code" => 401,
-            "message" => "JWT Token not found"
+            'status' => 401,
+            'detail' => 'Could not find JWT token',
+            "type" => "jwt_token_not_found",
+            "title" => "JWT token not found",
         ]);
     }
 
@@ -67,10 +122,13 @@ class ProductResourceTest extends CustomApiTestCase
     {
         $client = self::createClient();
         $this->createUserAndLogin($client, 'user1', 'user1@example.com', 'foo');
-        $client->request('POST', '/products', [
+        $client->request('POST', '/api/products', [
             'json' => [
-                'name' => 'banana',
-                'kcal' => 100
+                "name" => 'banana',
+                "kcal" => 1,
+                "protein" => 1,
+                "carbs" => 1,
+                "fat" => 1,
             ],
         ]);
         $this->assertResponseHasHeader('Content-Type', 'application/json');
@@ -83,12 +141,14 @@ class ProductResourceTest extends CustomApiTestCase
     public function testDeleteNotExistingProductWhenUnauthorized()
     {
         $client = self::createClient();
-        $client->request('DELETE', '/products/1');
+        $client->request('DELETE', '/api/products/1');
         $this->assertResponseHasHeader('Content-Type', 'application/problem+json');
         $this->assertResponseStatusCodeSame(Response::HTTP_UNAUTHORIZED);
         $this->assertJsonContains([
-            "code" => 401,
-            "message" => "JWT Token not found"
+            'status' => 401,
+            'detail' => 'Could not find JWT token',
+            "type" => "jwt_token_not_found",
+            "title" => "JWT token not found",
         ]);
     }
 
@@ -96,14 +156,14 @@ class ProductResourceTest extends CustomApiTestCase
     {
         $client = self::createClient();
         $this->createUserAndLogin($client, 'user1', 'user1@example.com', 'foo');
-        $client->request('DELETE', '/products/1');
+        $client->request('DELETE', '/api/products/1');
         $this->assertResponseHasHeader('Content-Type', 'application/problem+json');
-        $this->assertResponseStatusCodeSame(Response::HTTP_FORBIDDEN);
+        $this->assertResponseStatusCodeSame(Response::HTTP_NOT_FOUND);
         $this->assertJsonContains([
-            "status" => 403,
+            "status" => 404,
             "type" => "about:blank",
-            "title" => "Forbidden",
-            "detail" => "Access Denied."
+            "detail" => "Product does not exist",
+            "title" => "Not Found"
         ]);
     }
 
@@ -111,13 +171,8 @@ class ProductResourceTest extends CustomApiTestCase
     {
         $client = self::createClient();
         $user = $this->createUserAndLogin($client, 'user1', 'user1@example.com', 'foo');
-        $product = new Product();
-        $product->setName('banana');
-        $product->setKcal(100);
-        $product->setOwner($user);
-        $this->getEntityManager()->persist($product);
-        $this->getEntityManager()->flush();
-        $client->request('DELETE', '/products/1');
+        $this->createProduct('banana', 1, 1, 1, 1, $user);
+        $client->request('DELETE', '/api/products/1');
         $this->assertResponseHasHeader('Content-Type', 'application/json');
         $this->assertResponseStatusCodeSame(Response::HTTP_OK);
         $this->assertJsonContains([
@@ -130,21 +185,16 @@ class ProductResourceTest extends CustomApiTestCase
     {
         $client = self::createClient();
         $user1 = $this->createUser('user1', 'user1@example.com', 'foo');
-        $product = new Product();
-        $product->setName('banana');
-        $product->setKcal(100);
-        $product->setOwner($user1);
-        $this->getEntityManager()->persist($product);
-        $this->getEntityManager()->flush();
+        $this->createProduct('banana', 1, 1, 1, 1, $user1);
         $this->createUserAndLogin($client, 'user2', 'user2@example.com', 'foo');
-        $client->request('DELETE', '/products/1');
+        $client->request('DELETE', '/api/products/1');
         $this->assertResponseHasHeader('Content-Type', 'application/problem+json');
         $this->assertResponseStatusCodeSame(Response::HTTP_FORBIDDEN);
         $this->assertJsonContains([
             "status" => 403,
             "type" => "about:blank",
             "title" => "Forbidden",
-            "detail" => "Access Denied."
+            "detail" => "This product does not belong to you"
         ]);
     }
 
@@ -153,17 +203,13 @@ class ProductResourceTest extends CustomApiTestCase
         $client = self::createClient();
         $user1 = $this->createUser('user1', 'user1@example.com', 'foo');
         $user2 = $this->createUser('user2', 'user2@example.com', 'foo');
-        $product = new Product();
-        $product->setName('banana');
-        $product->setKcal(100);
-        $product->setOwner($user1);
-        $this->getEntityManager()->persist($product);
+        $this->createProduct('banana', 1, 1, 1, 1, $user1);
         $user2->setRoles(['ROLE_ADMIN']);
         $this->getEntityManager()->flush();
         $this->login($client, 'user2', 'foo');
         $this->assertResponseHasHeader('Content-Type', 'application/json');
         $this->assertResponseStatusCodeSame(Response::HTTP_OK);
-        $client->request('DELETE', '/products/1');
+        $client->request('DELETE', '/api/products/1');
         $this->assertResponseHasHeader('Content-Type', 'application/json');
         $this->assertResponseStatusCodeSame(Response::HTTP_OK);
         $this->assertJsonContains([
@@ -174,12 +220,14 @@ class ProductResourceTest extends CustomApiTestCase
     public function testPatchNotExistingProductWhenUnauthorized()
     {
         $client = self::createClient();
-        $client->request('PATCH', '/products/1');
+        $client->request('PATCH', '/api/products/1');
         $this->assertResponseHasHeader('Content-Type', 'application/problem+json');
         $this->assertResponseStatusCodeSame(Response::HTTP_UNAUTHORIZED);
         $this->assertJsonContains([
-            "code" => 401,
-            "message" => "JWT Token not found"
+            'status' => 401,
+            'type' => 'jwt_token_not_found',
+            'title' => 'JWT token not found',
+            'detail' => 'Could not find JWT token',
         ]);
     }
 
@@ -187,14 +235,14 @@ class ProductResourceTest extends CustomApiTestCase
     {
         $client = self::createClient();
         $this->createUserAndLogin($client, 'user1', 'user1@example.com', 'foo');
-        $client->request('DELETE', '/products/1');
+        $client->request('DELETE', '/api/products/1');
         $this->assertResponseHasHeader('Content-Type', 'application/problem+json');
-        $this->assertResponseStatusCodeSame(Response::HTTP_FORBIDDEN);
+        $this->assertResponseStatusCodeSame(Response::HTTP_NOT_FOUND);
         $this->assertJsonContains([
-            "status" => 403,
+            "status" => 404,
             "type" => "about:blank",
-            "title" => "Forbidden",
-            "detail" => "Access Denied."
+            "detail" => "Product does not exist",
+            "title" => "Not Found"
         ]);
     }
 
@@ -202,13 +250,8 @@ class ProductResourceTest extends CustomApiTestCase
     {
         $client = self::createClient();
         $user = $this->createUserAndLogin($client, 'user1', 'user1@example.com', 'foo');
-        $product = new Product();
-        $product->setName('banana');
-        $product->setKcal(100);
-        $product->setOwner($user);
-        $this->getEntityManager()->persist($product);
-        $this->getEntityManager()->flush();
-        $client->request('PATCH', '/products/1', [
+        $this->createProduct('banana', 1, 1, 1, 1, $user);
+        $client->request('PATCH', '/api/products/1', [
             'json' => [
                 'name' => 'apple',
                 'kcal' => 200
@@ -218,10 +261,9 @@ class ProductResourceTest extends CustomApiTestCase
         $this->assertJsonContains([
             'info' => 'Product has been updated'
         ]);
-        $client->request('GET', '/products/1');
+        $client->request('GET', '/api/products/1');
         $this->assertResponseHasHeader('Content-Type', 'application/json');
         $this->assertResponseStatusCodeSame(Response::HTTP_OK);
-        //dd(json_decode($client->getResponse()->getContent()));
         $this->assertJsonContains([
             'name' => 'apple',
             'kcal' => 200
@@ -232,14 +274,9 @@ class ProductResourceTest extends CustomApiTestCase
     {
         $client = self::createClient();
         $user1 = $this->createUser('user1', 'user1@example.com', 'foo');
-        $product = new Product();
-        $product->setName('banana');
-        $product->setKcal(100);
-        $product->setOwner($user1);
-        $this->getEntityManager()->persist($product);
-        $this->getEntityManager()->flush();
+        $this->createProduct('banana', 1, 1, 1, 1, $user1);
         $this->createUserAndLogin($client, 'user2', 'user2@example.com', 'foo');
-        $client->request('PATCH', '/products/1', [
+        $client->request('PATCH', '/api/products/1', [
             'json' => [
                 'name' => 'apple',
                 'kcal' => 200
@@ -250,7 +287,7 @@ class ProductResourceTest extends CustomApiTestCase
             "status" => 403,
             "type" => "about:blank",
             "title" => "Forbidden",
-            "detail" => "Access Denied."
+            "detail" => "This product does not belong to you"
         ]);
     }
 
@@ -259,17 +296,13 @@ class ProductResourceTest extends CustomApiTestCase
         $client = self::createClient();
         $user1 = $this->createUser('user1', 'user1@example.com', 'foo');
         $user2 = $this->createUser('user2', 'user2@example.com', 'foo');
-        $product = new Product();
-        $product->setName('banana');
-        $product->setKcal(100);
-        $product->setOwner($user1);
-        $this->getEntityManager()->persist($product);
+        $this->createProduct('banana', 1, 1, 1, 1, $user1);
         $user2->setRoles(['ROLE_ADMIN']);
         $this->getEntityManager()->flush();
         $this->login($client, 'user2', 'foo');
         $this->assertResponseHasHeader('Content-Type', 'application/json');
         $this->assertResponseStatusCodeSame(Response::HTTP_OK);
-        $client->request('PATCH', '/products/1', [
+        $client->request('PATCH', '/api/products/1', [
             'json' => [
                 'name' => 'apple',
                 'kcal' => 200
@@ -285,7 +318,7 @@ class ProductResourceTest extends CustomApiTestCase
     {
         $client = self::createClient();
         $this->createUserAndLogin($client, 'user1', 'user1@example.com', 'foo');
-        $client->request('POST', '/products', [
+        $client->request('POST', '/api/products', [
             'json' => [
                 'name' => '',
                 'kcal' => ''
@@ -300,10 +333,13 @@ class ProductResourceTest extends CustomApiTestCase
             "title" => "There was a validation error.",
             "errors" => [
                 "name" => ["This value should not be blank."],
-                "kcal" => ["This value should not be blank."]
+                "kcal" => ["This value should not be blank."],
+                "protein" => ["This value should not be blank."],
+                "carbs" => ["This value should not be blank."],
+                "fat" => ["This value should not be blank."],
             ]
         ]);
-        $client->request('POST', '/products', [
+        $client->request('POST', '/api/products', [
             'json' => [
                 'name' => '$',
                 'kcal' => '$'
@@ -319,15 +355,13 @@ class ProductResourceTest extends CustomApiTestCase
             "errors" => [
                 "name" => [
                     "This value is too short. It should have 3 characters or more.",
-                    "This value should be of type alnum.",
-
                 ],
                 "kcal" => [
                     "This value is not valid.",
                 ]
             ]
         ]);
-        $client->request('POST', '/products', [
+        $client->request('POST', '/api/products', [
             'json' => [
                 'name' => 'a1',
                 'kcal' => '-1'
@@ -354,13 +388,8 @@ class ProductResourceTest extends CustomApiTestCase
     {
         $client = self::createClient();
         $user = $this->createUserAndLogin($client, 'user1', 'user1@example.com', 'foo');
-        $product = new Product();
-        $product->setName('banana');
-        $product->setKcal(100);
-        $product->setOwner($user);
-        $this->getEntityManager()->persist($product);
-        $this->getEntityManager()->flush();
-        $client->request('PATCH', '/products/1', [
+        $this->createProduct('banana', 1, 1, 1, 1, $user);
+        $client->request('PATCH', '/api/products/1', [
             'json' => [
                 'name' => '',
                 'kcal' => ''
@@ -377,7 +406,7 @@ class ProductResourceTest extends CustomApiTestCase
                 "kcal" => ["This value should not be blank."]
             ]
         ]);
-        $client->request('PATCH', '/products/1', [
+        $client->request('PATCH', '/api/products/1', [
             'json' => [
                 'name' => '$',
                 'kcal' => '$'
@@ -393,15 +422,13 @@ class ProductResourceTest extends CustomApiTestCase
             "errors" => [
                 "name" => [
                     "This value is too short. It should have 3 characters or more.",
-                    "This value should be of type alnum.",
-
                 ],
                 "kcal" => [
                     "This value is not valid.",
                 ]
             ]
         ]);
-        $client->request('PATCH', '/products/1', [
+        $client->request('PATCH', '/api/products/1', [
             'json' => [
                 'name' => 'a1',
                 'kcal' => '-1'
@@ -435,7 +462,7 @@ class ProductResourceTest extends CustomApiTestCase
 EOF;
         $client = self::createClient();
         $this->createUserAndLogin($client, 'example', 'example@example.com', 'Password123');
-        $client->request('POST', '/products', [
+        $client->request('POST', '/api/products', [
             'json' => [
                 $invalidJson
             ]
@@ -461,13 +488,8 @@ EOF;
 EOF;
         $client = self::createClient();
         $user = $this->createUserAndLogin($client, 'user1', 'user1@example.com', 'foo');
-        $product = new Product();
-        $product->setName('banana');
-        $product->setKcal(100);
-        $product->setOwner($user);
-        $this->getEntityManager()->persist($product);
-        $this->getEntityManager()->flush();
-        $client->request('PATCH', '/products/1', [
+        $this->createProduct('banana', 1, 1, 1, 1, $user);
+        $client->request('PATCH', '/api/products/1', [
             'json' => [
                 $invalidJson
             ]

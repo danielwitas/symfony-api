@@ -34,6 +34,11 @@ use App\Annotation\Link;
  *     route = "users_products",
  *     params = {"id": "object.getId()"}
  * )
+ * * @Link(
+ *     "templates",
+ *     route = "users_templates",
+ *     params = {"id": "object.getId()"}
+ * )
  */
 class User implements UserInterface, ApiEntityInterface
 {
@@ -53,8 +58,7 @@ class User implements UserInterface, ApiEntityInterface
     /**
      * @Assert\NotBlank(groups={"registration"})
      * @Assert\NotNull(groups={"registration"})
-     * @Assert\Length(min=3, max=50)
-     * @Assert\Type(type="alnum")
+     * @Assert\Length(min=3, max=20)
      * @ORM\Column(type="string", length=255)
      * @Groups("user")
      */
@@ -70,6 +74,8 @@ class User implements UserInterface, ApiEntityInterface
     private $email;
 
     /**
+     * @Assert\NotBlank(groups={"change-role"})
+     * @Assert\NotNull(groups={"change-role"})
      * @ORM\Column(type="json")
      * @Groups("user")
      *
@@ -85,12 +91,14 @@ class User implements UserInterface, ApiEntityInterface
      *     groups={"registration"}
      * )
      * @Assert\NotBlank(groups={"registration", "change-password"})
-     * @Assert\Length(min=3, max=50)
+     * @Assert\NotNull(groups={"registration", "change-password"})
+     * @Assert\Length(min=7, max=50)
      */
     private $password;
 
     /**
      * @Assert\NotBlank(groups={"registration"})
+     * @Assert\NotNull(groups={"registration"})
      * @Assert\Expression(
      *     "this.getPassword() === this.getRepeatPassword()",
      *     message="Passwords do not match",
@@ -101,6 +109,7 @@ class User implements UserInterface, ApiEntityInterface
 
     /**
      * @Assert\NotBlank(groups={"change-password"})
+     * @Assert\NotNull(groups={"change-password"})
      * @Assert\Regex(
      *     groups={"change-password"},
      *     pattern="/(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9]).{7,}/",
@@ -110,6 +119,7 @@ class User implements UserInterface, ApiEntityInterface
     private $newPassword;
     /**
      * @Assert\NotBlank(groups={"change-password"})
+     * @Assert\NotNull(groups={"change-password"})
      * @Assert\Expression(
      *     "this.getNewPassword() === this.getRepeatNewPassword()",
      *     message="Passwords do not match",

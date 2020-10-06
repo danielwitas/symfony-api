@@ -19,14 +19,41 @@ class ProductRepository extends ServiceEntityRepository
         parent::__construct($registry, Product::class);
     }
 
-    public function findAllQueryBuilder($filter = '')
+    public function findAllQueryBuilder($user, $filter = '')
+    {
+        if(!$filter) {
+            return $this->findAllByOwner($user);
+        }
+        return $this->findAllByFilter($user, $filter);
+    }
+
+    public function findAllByFilter($user, $filter)
     {
         $qb = $this->createQueryBuilder('product');
-        if($filter) {
-            $qb->andWhere('product.name LIKE :filter')
-                ->setParameter('filter', '%'.$filter.'%');
+        $qb->andWhere('product.name LIKE :filter')
+            ->andWhere('product.owner = :owner')
+            ->andWhere('product.template IS NULL')
+            ->orderBy('product.id', 'DESC')
+            ->setParameters([
+                'filter' => '%'.$filter.'%',
+                'owner' => $user,
+            ]);
+        return $qb;
+    }
+
+    public function findAllByOwner($user)
+    {
+        $qb = $this->createQueryBuilder('product');
+        if($user) {
+            $qb->andWhere('product.owner = :owner')
+                ->andWhere('product.template IS NULL')
+                ->orderBy('product.id', 'DESC')
+                ->setParameters([
+                    'owner' => $user,
+                ]);
         }
         return $qb;
+
     }
 
     // /**

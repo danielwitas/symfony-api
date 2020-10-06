@@ -2,91 +2,59 @@
 
 namespace App\Controller;
 
-use App\Entity\Product;
-use App\Entity\User;
-use App\Form\ChangePasswordType;
-use App\Form\PasswordResetType;
-use App\Form\UserType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
+/**
+ * @Route("/api/users")
+ */
 class UserController extends ApiController
 {
     /**
-     * @Route("/users/{id}", name="users_get_item", methods="GET", requirements={"id"="\d+"})
+     * @Route("/{id}", name="users_get_item", methods="GET", requirements={"id"="\d+"})
      */
-    public function item(int $id)
+    public function item(int $id): Response
     {
-        $user = $this->entityManager->getRepository(User::class)->findOneBy(['id' => $id]);
-        if (!$user) {
-            throw $this->createNotFoundException(sprintf('No user found with id %d', $id));
-        }
+        $user = $this->userResourceManager->getSingleUser($id);
         return $this->createApiResponse($user);
     }
 
     /**
-     * @Route("/users", name="users_get_collection", methods="GET")
+     * @Route(name="users_get_collection", methods="GET")
      */
-    public function collection(Request $request)
+    public function collection(Request $request): Response
     {
-        $filter = $request->query->get('filter');
-        $qb = $this->entityManager->getRepository(User::class)->findAllQueryBuilder($filter);
-        $paginatedCollection = $this->paginationFactory->createCollection($qb, $request, 'users_get_collection');
-        return $this->createApiResponse($paginatedCollection->getResult('users'));
+        $collection = $this->userResourceManager->getUserCollection($request);
+        return $this->createApiResponse($collection);
     }
 
     /**
-     * @Route("/users/{id}", name="users_delete_item", methods="DELETE", requirements={"id"="\d+"})
+     * @Route("/{id}", name="users_delete_item", methods="DELETE", requirements={"id"="\d+"})
      */
-    public function delete(int $id)
+    public function delete(int $id): Response
     {
-        $user = $this->entityManager->getRepository(User::class)->findOneBy(['id' => $id]);
-        if (!$user) {
-            throw $this->createNotFoundException(sprintf('No user found with id %d', $id));
-        }
-        $this->entityManager->remove($user);
-        $this->entityManager->flush();
+        $this->userResourceManager->deleteUser($id);
         return $this->createApiResponse(['info' => 'User has been deleted.']);
     }
 
-    /**
-     * @Route("/users", name="users_post_item", methods="POST")
-     */
-    public function post(Request $request)
-    {
-        $data = $this->jsonDecode($request->getContent());
-        $this->isJsonValid($data);
-        $form = $this->createForm(UserType::class, new User());
-        $form->submit($data);
-        $this->isFormValid($form);
 
-        /** @var User $user */
-        $user = $form->getData();
-        $user->setConfirmationToken($this->tokenGenerator->getRandomSecureToken());
-        $user->setEnabled(false);
-        $user->setPassword(
-            $this->userPasswordEncoder->encodePassword($user, $user->getPassword())
-        );
-        $this->entityManager->persist($user);
-        $this->entityManager->flush();
-        $this->mailer->sendConfirmationEmail($user);
-        return $this->createApiResponse([
-            'info' => 'Success. Check your e-mail and confirm your accout to complete registration'
-        ], Response::HTTP_CREATED);
+    /**
+     * @Route("/{id}/products", name="users_products", methods="GET")
+     */
+    public function userProducts(int $id): Response
+    {
+        $products = $this->userResourceManager->getUserProducts($id);
+        return $this->createApiResponse($products);
     }
 
     /**
-     * @Route("/users/{id}/products", name="users_products", methods="GET")
+     * @Route("/{id}/templates", name="users_templates", methods="GET")
      */
-    public function userProducts(int $id)
+    public function userTemplates(int $id): Response
     {
-        $user = $this->entityManager->getRepository(User::class)->findOneBy(['id' => $id]);
-        if (!$user) {
-            throw $this->createNotFoundException(sprintf('No user found with id %d', $id));
-        }
-        $products = $this->entityManager->getRepository(Product::class)->findBy(['owner' => $user]);
-        return $this->createApiResponse($products);
+        $templates = $this->userResourceManager->getUserTemplates($id);
+        return $this->createApiResponse($templates);
     }
 
 }

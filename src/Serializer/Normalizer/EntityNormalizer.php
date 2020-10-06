@@ -49,14 +49,6 @@ class EntityNormalizer implements ContextAwareNormalizerInterface
             $data['links'] = $links;
         }
 
-
-//        $data['href']['self'] = $this->router->generate('users_get_item', [
-//            'id' => $object->getId(),
-//        ], UrlGeneratorInterface::ABSOLUTE_PATH);
-//        $data['href']['products'] = $this->router->generate('users_products', [
-//            'id' => $object->getId(),
-//        ], UrlGeneratorInterface::ABSOLUTE_PATH);
-
         return $data;
     }
 

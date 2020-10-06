@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Annotation\Link;
 use App\Repository\TemplateRepository;
 use Carbon\Carbon;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -11,8 +12,24 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
+
 /**
  * @ORM\Entity(repositoryClass=TemplateRepository::class)
+ * @Link(
+ *     "self",
+ *     route = "templates_get_item",
+ *     params = {"id": "object.getId()"}
+ * )
+ * @Link(
+ *     "owner",
+ *     route = "users_get_item",
+ *     params = {"id": "object.getOwner().getId()"}
+ * )
+ * @Link(
+ *     "products",
+ *     route = "templates_get_products_collection",
+ *     params = {"id": "object.getId()"}
+ * )
  */
 class Template implements ApiEntityInterface
 {
@@ -47,13 +64,11 @@ class Template implements ApiEntityInterface
     /**
      * @ORM\ManyToOne(targetEntity=User::class, inversedBy="templates")
      * @ORM\JoinColumn(nullable=false)
-     * @Groups("user")
      */
     private $owner;
 
     /**
      * @ORM\OneToMany(targetEntity=Product::class, mappedBy="template", cascade={"persist", "remove"})
-     * @Groups("user")
      */
     private $products;
 

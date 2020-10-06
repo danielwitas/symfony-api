@@ -19,14 +19,39 @@ class TemplateRepository extends ServiceEntityRepository
         parent::__construct($registry, Template::class);
     }
 
-    public function findAllQueryBuilder($filter = '')
+
+
+    public function findAllQueryBuilder($user, $filter = '')
+    {
+        if(!$filter) {
+            return $this->findAllByOwner($user);
+        }
+        return $this->findAllByFilter($user, $filter);
+    }
+
+    public function findAllByFilter($user, $filter)
     {
         $qb = $this->createQueryBuilder('template');
-        if($filter) {
-            $qb->andWhere('template.name LIKE :filter')
-                ->setParameter('filter', '%'.$filter.'%');
+        $qb->andWhere('template.name LIKE :filter')
+            ->andWhere('template.owner = :owner')
+            ->orderBy('template.id', 'DESC')
+            ->setParameters([
+                'filter' => '%'.$filter.'%',
+                'owner' => $user
+            ]);
+        return $qb;
+    }
+
+    public function findAllByOwner($user)
+    {
+        $qb = $this->createQueryBuilder('template');
+        if($user) {
+            $qb->andWhere('template.owner = :owner')
+                ->orderBy('template.id', 'DESC')
+                ->setParameter('owner', $user);
         }
         return $qb;
+
     }
 
     // /**

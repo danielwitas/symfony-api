@@ -25,6 +25,8 @@ use Symfony\Component\Validator\Constraints as Assert;
  */
 class Product implements ApiEntityInterface
 {
+
+
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue()
@@ -37,7 +39,6 @@ class Product implements ApiEntityInterface
      * @Assert\NotBlank()
      * @Assert\Type("string")
      * @Assert\Length(min=3, max=20)
-     * @Assert\Type(type="alnum")
      * @ORM\Column(type="string", length=255)
      * @Groups("user")
      */
@@ -47,11 +48,46 @@ class Product implements ApiEntityInterface
      * @Assert\NotBlank()
      * @Assert\GreaterThanOrEqual(0)
      * @Assert\Length(max=20)
-     * @Assert\Type(type="numeric")
      * @ORM\Column(type="integer")
      * @Groups("user")
      */
     private $kcal;
+
+    /**
+     * @Assert\GreaterThanOrEqual(0)
+     * @ORM\Column(type="integer")
+     * @Assert\Length(max=20)
+     * @Groups("user")
+     */
+    private $weight;
+
+    /**
+     * @Assert\NotBlank()
+     * @Assert\GreaterThanOrEqual(0)
+     * @Assert\Length(max=20)
+     * @ORM\Column(type="integer")
+     * @Groups("user")
+     */
+    private $fat;
+
+    /**
+     * @Assert\NotBlank()
+     * @Assert\GreaterThanOrEqual(0)
+     * @Assert\Length(max=20)
+     * @ORM\Column(type="integer")
+     * @Groups("user")
+     */
+    private $carbs;
+
+    /**
+     * @Assert\NotBlank()
+     * @Assert\GreaterThanOrEqual(0)
+     * @Assert\Length(max=20)
+     * @ORM\Column(type="integer")
+     * @Groups("user")
+     */
+    private $protein;
+
 
     /**
      * @ORM\Column(type="datetime")
@@ -116,7 +152,7 @@ class Product implements ApiEntityInterface
         return $this->owner;
     }
 
-    public function setOwner(?User $owner): self
+    public function setOwner(?UserInterface $owner): self
     {
         $this->owner = $owner;
 
@@ -133,6 +169,46 @@ class Product implements ApiEntityInterface
         $this->template = $template;
 
         return $this;
+    }
+
+    public function getWeight(): ?int
+    {
+        return $this->weight;
+    }
+
+    public function setWeight(?int $weight): void
+    {
+        $this->weight = $weight;
+    }
+
+    public function getFat()
+    {
+        return $this->fat;
+    }
+
+    public function setFat($fat): void
+    {
+        $this->fat = $fat;
+    }
+
+    public function getCarbs()
+    {
+        return $this->carbs;
+    }
+
+    public function setCarbs($carbs): void
+    {
+        $this->carbs = $carbs;
+    }
+
+    public function getProtein()
+    {
+        return $this->protein;
+    }
+
+    public function setProtein($protein): void
+    {
+        $this->protein = $protein;
     }
 
 

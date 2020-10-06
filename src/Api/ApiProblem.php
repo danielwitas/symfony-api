@@ -11,7 +11,11 @@ class ApiProblem
     const TYPE_INVALID_REQUEST_BODY_FORMAT = 'invalid_body_format';
     const TYPE_INVALID_CONFIRMATION_TOKEN = 'invalid_confirmation_token';
     const TYPE_INVALID_LOGIN_REQUEST = 'invalid_login_request';
+    const TYPE_EMAIL_ALREADY_EXISTS = 'email_already_exists';
+    const TYPE_TOKEN_NOT_FOUND = 'jwt_token_not_found';
     private static $titles = array(
+        self::TYPE_TOKEN_NOT_FOUND => 'JWT token not found',
+        self::TYPE_EMAIL_ALREADY_EXISTS => 'E-mail address already exists.',
         self::TYPE_VALIDATION_ERROR => 'There was a validation error.',
         self::TYPE_INVALID_REQUEST_BODY_FORMAT => 'Invalid JSON format sent',
         self::TYPE_INVALID_CONFIRMATION_TOKEN => 'Invalid confirmation token',
@@ -26,8 +30,6 @@ class ApiProblem
     {
         $this->statusCode = $statusCode;
         if ($type === null) {
-            // no type? The default is about:blank and the title should
-            // be the standard status code message
             $type = 'about:blank';
             $title = isset(Response::$statusTexts[$statusCode])
                 ? Response::$statusTexts[$statusCode]

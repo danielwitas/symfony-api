@@ -3,60 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <title>{% block title %}Welcome!{% endblock %}</title>
+    {{ encore_entry_link_tags('app') }}
+    <link rel="shortcut icon" type="image/png" href="https://img.icons8.com/cotton/2x/calculator.png">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,700;1,100&display=swap" rel="stylesheet">
     {% block stylesheets %}{% endblock %}
+
 </head>
 <body>
-{% block body %}
-    <h1>login</h1>
-    <script>
-        window.user = "{{ user|raw }}"
-    </script>
-
-
-    {% if app.debug %}
-        <p>Request method: {{ app.request.method }}</p>
-        <p>Application Environment: {{ app.environment }}</p>
-    {% endif %}
-    <form action="{{ path('security_login') }}" method="post" class="login_form">
-        email
-        <input type="text" name="email" id="email"/>
-        <br /><br />
-        password
-        <input type="text" name="password" id="password"/>
-        <br /><br />
-        <input type="submit" value="Login!" />
-    </form>
-{% endblock %}
-{% block javascripts %}
-    {{ form(form) }}
-    <script
-            src="https://code.jquery.com/jquery-3.5.1.js"
-            integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc="
-            crossorigin="anonymous"></script>
-    <script type="text/javascript">
-        $('.login_form').on('submit', function (event) {
-
-            //event.preventDefault()
-            let email = $('#email').val()
-            let password = $('#password').val()
-            var data = {"username": email, "password": password}
-
-            $.ajax({
-                url:"/login",
-                type:"POST",
-                data: JSON.stringify(data),
-                contentType:"application/json; charset=utf-8",
-                dataType:"json",
-                success: function(r){
-                    console.log(r)
-                }
-            })
-
-
-        })
-    </script>
-
-{% endblock %}
+{% block body %}{% endblock %}
+{% block javascripts %}{% endblock %}
+{{ encore_entry_script_tags('app') }}
 </body>
-
 </html>
