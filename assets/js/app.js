@@ -1,5 +1,4 @@
 import axios from 'axios'
-import gsap from 'gsap/all'
 import '../css/app.css';
 import Vue from 'vue'
 import store from './stores/store'

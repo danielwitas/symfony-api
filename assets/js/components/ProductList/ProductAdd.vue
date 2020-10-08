@@ -94,9 +94,8 @@
 </template>
 
 <script>
-import validator from "../../services/product-validator";
 export default {
-  name: 'addUserProductModal',
+  name: 'ProductAdd',
   data: () => ({
     name: '',
     nameRules: [

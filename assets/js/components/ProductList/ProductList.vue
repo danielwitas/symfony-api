@@ -96,7 +96,6 @@ export default {
       });
     },
     toggleSearchList() {
-      console.log(this.DISPLAY_PRODUCT_SEARCH_LIST)
       this.$store.commit('SET_DISPLAY_PRODUCT_SEARCH_LIST', !this.DISPLAY_PRODUCT_SEARCH_LIST)
     },
   },

@@ -8,13 +8,14 @@ use App\Security\ChangeRoleService;
 use App\Security\ChangePasswordService;
 use App\Security\ResetPasswordService;
 use App\Security\RegisterService;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
  * @Route("/api")
  */
-class SecurityController extends ApiController
+class SecurityController extends AbstractController
 {
 
     /**
@@ -24,7 +25,7 @@ class SecurityController extends ApiController
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $passwordChangeService->changePassword($request, $this->getUser());
-        return $this->createApiResponse(['info' => 'Password has been changed.']);
+        return $this->json(['info' => 'Password has been changed.']);
     }
 
     /**
@@ -33,7 +34,7 @@ class SecurityController extends ApiController
     public function initResetPassword(Request $request, ResetPasswordService $resetPasswordService)
     {
         $resetPasswordService->initResetPassword($request);
-        return $this->createApiResponse([
+        return $this->json([
             'info' => 'E-mail with instructions to reset password has been sent.'
         ]);
     }
@@ -44,7 +45,7 @@ class SecurityController extends ApiController
     public function completeResetPassword(string $token, ResetPasswordService $resetPasswordService)
     {
         $resetPasswordService->completeResetPassword($token);
-        return $this->createApiResponse([
+        return $this->json([
             'info' => 'Password has been reset successfully. Check your email for new password'
         ]);
     }
@@ -55,7 +56,7 @@ class SecurityController extends ApiController
     public function initRegistration(Request $request, RegisterService $registerService)
     {
         $registerService->initRegistration($request);
-        return $this->createApiResponse([
+        return $this->json([
             'info' => 'Success. Check your e-mail and confirm your account to complete registration'
         ]);
     }
@@ -66,7 +67,7 @@ class SecurityController extends ApiController
     public function completeRegistration(string $token, RegisterService $registerService)
     {
         $registerService->completeRegistration($token);
-        return $this->createApiResponse([
+        return $this->json([
             'info' => 'Account registration completed. You can now log in.'
         ]);
     }
@@ -78,7 +79,7 @@ class SecurityController extends ApiController
     {
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
         $changeRoleService->changeRole($request, $id);
-        return $this->createApiResponse(['info' => 'Role has been set']);
+        return $this->json(['info' => 'Role has been set']);
     }
 
     /**
@@ -88,7 +89,7 @@ class SecurityController extends ApiController
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $changeEmailService->changeEmail($request, $this->getUser());
-        return $this->createApiResponse(['info' => 'Email address has been set']);
+        return $this->json(['info' => 'Email address has been set']);
     }
 
 

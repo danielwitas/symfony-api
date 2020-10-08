@@ -51,7 +51,6 @@ export default {
       this.searchTimeout = setTimeout(() => {
         this.$store.dispatch('SEARCH_USER_PRODUCTS', this.input)
             .then(response => {
-              console.log(this.USER_PRODUCTS)
             })
             .catch(error => {
             })

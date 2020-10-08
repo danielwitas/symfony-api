@@ -2,6 +2,9 @@
 
 namespace App\Controller;
 
+use App\Services\ProductResourceManager;
+use App\Services\TemplateResourceManager;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -9,15 +12,24 @@ use Symfony\Component\Routing\Annotation\Route;
 /**
  * @Route("/api/templates")
  */
-class TemplateController extends ApiController
+class TemplateController extends AbstractController
 {
+
+    private $templateResourceManager;
+    private $productResourceManager;
+
+    public function __construct(TemplateResourceManager $templateResourceManager, ProductResourceManager $productResourceManager)
+    {
+        $this->templateResourceManager = $templateResourceManager;
+        $this->productResourceManager = $productResourceManager;
+    }
     /**
      * @Route("/{id}", name="templates_get_item", methods="GET", requirements={"id"="\d+"})
      */
     public function item(int $id): Response
     {
-        $template = $this->templateManager->getSingleTemplate($id);
-        return $this->createApiResponse($template);
+        $template = $this->templateResourceManager->getSingleTemplate($id);
+        return $this->json($template);
     }
 
     /**
@@ -25,8 +37,8 @@ class TemplateController extends ApiController
      */
     public function collection(Request $request): Response
     {
-        $collection = $this->templateManager->getTemplateCollection($request);
-        return $this->createApiResponse($collection);
+        $collection = $this->templateResourceManager->getTemplateCollection($request);
+        return $this->json($collection);
     }
 
     /**
@@ -34,8 +46,8 @@ class TemplateController extends ApiController
      */
     public function delete(int $id): Response
     {
-        $this->templateManager->deleteTemplate($id);
-        return $this->createApiResponse(['info' => 'Template has been deleted']);
+        $this->templateResourceManager->deleteTemplate($id);
+        return $this->json(['info' => 'Template has been deleted']);
     }
 
     /**
@@ -43,8 +55,8 @@ class TemplateController extends ApiController
      */
     public function post(Request $request): Response
     {
-        $this->templateManager->addTemplate($request);
-        return $this->createApiResponse(['info' => 'Template has been added'], Response::HTTP_CREATED);
+        $this->templateResourceManager->addTemplate($request);
+        return $this->json(['info' => 'Template has been added'], Response::HTTP_CREATED);
     }
 
     /**
@@ -52,8 +64,8 @@ class TemplateController extends ApiController
      */
     public function patch(Request $request, int $id): Response
     {
-        $this->templateManager->updateTemplate($request, $id);
-        return $this->createApiResponse(['info' => 'Template has been updated']);
+        $this->templateResourceManager->updateTemplate($request, $id);
+        return $this->json(['info' => 'Template has been updated']);
     }
 
     /**
@@ -61,8 +73,8 @@ class TemplateController extends ApiController
      */
     public function postTemplateProduct(Request $request, int $id): Response
     {
-        $this->productManager->addTemplateProduct($request, $id);
-        return $this->createApiResponse(['info' => 'Product has been added'], Response::HTTP_CREATED);
+        $this->productResourceManager->addTemplateProduct($request, $id);
+        return $this->json(['info' => 'Product has been added'], Response::HTTP_CREATED);
     }
 
     /**
@@ -70,8 +82,8 @@ class TemplateController extends ApiController
      */
     public function getTemplateProducts(int $id): Response
     {
-        $products = $this->productManager->getTemplateProducts($id);
-        return $this->createApiResponse($products);
+        $products = $this->productResourceManager->getTemplateProducts($id);
+        return $this->json($products);
     }
 
 

@@ -43,7 +43,6 @@ export default {
         },
         GET_SINGLE_PRODUCT: async (context, payload) => {
             let response = await axios.get(`products/${payload}`)
-            console.log(response)
             context.commit('SET_SINGLE_PRODUCT', response)
         },
         DELETE_PRODUCT: (context, id) => {

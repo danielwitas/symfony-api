@@ -2,6 +2,8 @@
 
 namespace App\Controller;
 
+use App\Services\ProductResourceManager;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -9,15 +11,22 @@ use Symfony\Component\Routing\Annotation\Route;
 /**
  * @Route("/api/products")
  */
-class ProductController extends ApiController
+class ProductController extends AbstractController
 {
+
+    private $productResourceManager;
+
+    public function __construct(ProductResourceManager $productResourceManager)
+    {
+        $this->productResourceManager = $productResourceManager;
+    }
     /**
      * @Route("/{id}", name="products_get_item", methods="GET", requirements={"id"="\d+"})
      */
     public function item(int $id): Response
     {
-        $product = $this->productManager->getSingleProduct($id);
-        return $this->createApiResponse($product);
+        $product = $this->productResourceManager->getSingleProduct($id);
+        return $this->json($product);
     }
 
     /**
@@ -25,8 +34,8 @@ class ProductController extends ApiController
      */
     public function collection(Request $request): Response
     {
-        $collection = $this->productManager->getProductCollection($request);
-        return $this->createApiResponse($collection);
+        $collection = $this->productResourceManager->getProductCollection($request);
+        return $this->json($collection);
     }
 
     /**
@@ -34,9 +43,9 @@ class ProductController extends ApiController
      */
     public function delete(int $id): Response
     {
-        $this->productManager->deleteProduct($id);
-        return $this->createApiResponse([
-            'info' => $this->productManager::PRODUCT_DELETED_MESSAGE
+        $this->productResourceManager->deleteProduct($id);
+        return $this->json([
+            'info' => $this->productResourceManager::PRODUCT_DELETED_MESSAGE
         ]);
     }
 
@@ -45,9 +54,9 @@ class ProductController extends ApiController
      */
     public function post(Request $request): Response
     {
-        $this->productManager->addUserProduct($request);
-        return $this->createApiResponse([
-            'info' => $this->productManager::PRODUCT_ADDED_MESSAGE],
+        $this->productResourceManager->addUserProduct($request);
+        return $this->json([
+            'info' => $this->productResourceManager::PRODUCT_ADDED_MESSAGE],
             Response::HTTP_CREATED
         );
     }
@@ -57,9 +66,9 @@ class ProductController extends ApiController
      */
     public function patch(Request $request, int $id): Response
     {
-        $this->productManager->updateProduct($request, $id);
-        return $this->createApiResponse([
-            'info' => $this->productManager::PRODUCT_UPDATED_MESSAGE
+        $this->productResourceManager->updateProduct($request, $id);
+        return $this->json([
+            'info' => $this->productResourceManager::PRODUCT_UPDATED_MESSAGE
         ]);
     }
 }

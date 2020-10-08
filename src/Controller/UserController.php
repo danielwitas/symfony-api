@@ -2,6 +2,8 @@
 
 namespace App\Controller;
 
+use App\Services\UserResourceManager;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -9,15 +11,22 @@ use Symfony\Component\Routing\Annotation\Route;
 /**
  * @Route("/api/users")
  */
-class UserController extends ApiController
+class UserController extends AbstractController
 {
+
+    private $userResourceManager;
+
+    public function __construct(UserResourceManager $userResourceManager)
+    {
+        $this->userResourceManager = $userResourceManager;
+    }
     /**
      * @Route("/{id}", name="users_get_item", methods="GET", requirements={"id"="\d+"})
      */
     public function item(int $id): Response
     {
         $user = $this->userResourceManager->getSingleUser($id);
-        return $this->createApiResponse($user);
+        return $this->json($user);
     }
 
     /**
@@ -26,7 +35,7 @@ class UserController extends ApiController
     public function collection(Request $request): Response
     {
         $collection = $this->userResourceManager->getUserCollection($request);
-        return $this->createApiResponse($collection);
+        return $this->json($collection);
     }
 
     /**
@@ -35,7 +44,7 @@ class UserController extends ApiController
     public function delete(int $id): Response
     {
         $this->userResourceManager->deleteUser($id);
-        return $this->createApiResponse(['info' => 'User has been deleted.']);
+        return $this->json(['info' => 'User has been deleted.']);
     }
 
 
@@ -45,7 +54,7 @@ class UserController extends ApiController
     public function userProducts(int $id): Response
     {
         $products = $this->userResourceManager->getUserProducts($id);
-        return $this->createApiResponse($products);
+        return $this->json($products);
     }
 
     /**
@@ -54,7 +63,7 @@ class UserController extends ApiController
     public function userTemplates(int $id): Response
     {
         $templates = $this->userResourceManager->getUserTemplates($id);
-        return $this->createApiResponse($templates);
+        return $this->json($templates);
     }
 
 }
